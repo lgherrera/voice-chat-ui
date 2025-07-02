@@ -7,17 +7,33 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import { useVapi } from './hooks/useVapi';
 import { VoiceWave } from './components/VoiceWave';
 import { TextChat } from './components/TextChat';
+import { TranscriptPage } from './components/TranscriptPage';
 
-/* -- secrets come from Vercel env -- */
-const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
+/* env secrets (set in Vercel) */
+const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 export default function App() {
-  const { start, stop, amp } = useVapi(apiKey, assistantId);
-  const [chatOpen, setChatOpen] = useState(false);
+  /* Vapi hook */
+  const { start, stop, amp, transcripts } = useVapi(apiKey, assistantId);
 
+  /* local UI state */
+  const [chatOpen, setChatOpen] = useState(false);
+  const [page, setPage] = useState<'home' | 'history'>('home');
+
+  /* -------- transcript page -------- */
+  if (page === 'history') {
+    return (
+      <TranscriptPage
+        transcripts={transcripts}
+        onBack={() => setPage('home')}
+      />
+    );
+  }
+
+  /* -------- home page -------- */
   return (
     <Box
       sx={{
@@ -33,7 +49,10 @@ export default function App() {
       }}
     >
       {/* Header */}
-      <Typography variant="h4" sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}>
+      <Typography
+        variant="h4"
+        sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}
+      >
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
@@ -49,8 +68,8 @@ export default function App() {
       >
         <VoiceWave amp={amp} />
 
+        {/* keyboard fallback */}
         <IconButton
-          aria-label="Type instead"
           sx={{
             mt: 6,
             flexDirection: 'column',
@@ -64,7 +83,7 @@ export default function App() {
         </IconButton>
       </Box>
 
-      {/* Footer */}
+      {/* Footer nav */}
       <Box sx={{ width: '100%', py: 2 }}>
         <Box
           sx={{
@@ -73,14 +92,16 @@ export default function App() {
             alignItems: 'center',
           }}
         >
+          {/* chat history icon */}
           <IconButton
             aria-label="Chat history"
+            onClick={() => setPage('history')}
             sx={{ color: 'grey.500', '&:hover': { color: 'common.white' } }}
           >
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* Start */}
+          {/* start call */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -100,7 +121,7 @@ export default function App() {
             </Box>
           </IconButton>
 
-          {/* Stop */}
+          {/* end call */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -126,11 +147,12 @@ export default function App() {
         </Box>
       </Box>
 
-      {/* Text-only drawer */}
+      {/* keyboard drawer */}
       <TextChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </Box>
   );
 }
+
 
 
 
