@@ -19,11 +19,11 @@ export default function App() {
   /* Vapi hook */
   const { start, stop, amp, transcripts } = useVapi(apiKey, assistantId);
 
-  /* local UI state */
+  /* UI state */
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* -------- transcript page -------- */
+  /* -------- transcript history page -------- */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -33,7 +33,7 @@ export default function App() {
     );
   }
 
-  /* -------- home page -------- */
+  /* -------- main (home) page -------- */
   return (
     <Box
       sx={{
@@ -49,14 +49,11 @@ export default function App() {
       }}
     >
       {/* Header */}
-      <Typography
-        variant="h4"
-        sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}
-      >
+      <Typography variant="h4" sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}>
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Main */}
+      {/* Main section */}
       <Box
         sx={{
           flexGrow: 1,
@@ -92,7 +89,7 @@ export default function App() {
             alignItems: 'center',
           }}
         >
-          {/* chat history icon */}
+          {/* history icon */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -137,10 +134,7 @@ export default function App() {
               }}
             >
               <PhoneIcon
-                sx={{
-                  transform: 'rotate(135deg)',
-                  fontSize: { xs: 28, md: 36 },
-                }}
+                sx={{ transform: 'rotate(135deg)', fontSize: { xs: 28, md: 36 } }}
               />
             </Box>
           </IconButton>
@@ -152,6 +146,7 @@ export default function App() {
     </Box>
   );
 }
+
 
 
 
