@@ -2,17 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import Vapi from '@vapi-ai/web';
 
 /**
- * useVapi — React hook
+ * useVapi – React hook
  * • boots a Vapi client
  * • exposes start()/stop()
- * • streams mic volume (0–1) for ring animation
- * • logs SDK errors, including HTTP status+body for start-method errors
+ * • streams mic volume (0–1) for UI animation
+ * • logs SDK errors, printing HTTP status & first detail line
  */
 export function useVapi(apiKey: string, assistantId: string) {
   const vapiRef = useRef<Vapi | null>(null);
 
-  const [amp, setAmp] = useState(0);                        // live mic loudness
-  const [status, setStatus] =
+  /* UI state */
+  const [amp,         setAmp]         = useState(0);  // live mic loudness
+  const [status,      setStatus]      =
     useState<'idle' | 'calling' | 'ended'>('idle');
   const [transcripts, setTranscripts] = useState<string[]>([]);
 
@@ -21,23 +22,28 @@ export function useVapi(apiKey: string, assistantId: string) {
     const vapi = new Vapi(apiKey);
     vapiRef.current = vapi;
 
-    /* ⇢ enhanced error listener */
+    /* ── enhanced error listener ── */
     vapi.on('error', async (e) => {
       console.error('[Vapi error]', e);
 
       if (e.error instanceof Response) {
+        const raw = e.error.clone();
         const body =
-          (await e.error.clone().json().catch(() => e.error.text())) ?? '(empty)';
+          (await raw.json().catch(() => raw.text())) ?? '(empty)';
         console.error('→ status', e.error.status, body);
-        /* Example output:
-           → status 403 { message: "Forbidden: origin not allowed" } */
+
+        // Print the first detail message if present
+        if (typeof body === 'object' && body?.message) {
+          const first = Array.isArray(body.message) ? body.message[0] : body.message;
+          console.error('→ detail', first);
+        }
       }
     });
 
     /* SDK “volume” event (~10×/sec). Not yet typed, so ignore TS check */
-    // @ts-ignore
+    // @ts-ignore – volume isn’t in the SDK’s .d.ts yet
     vapi.on('volume', (v: number) => {
-      console.log('mic level', v);      // DEBUG: watch numbers jump when you talk
+      console.log('mic level', v);     // DEBUG – should rise when you speak
       setAmp(v);
     });
 
@@ -54,17 +60,12 @@ export function useVapi(apiKey: string, assistantId: string) {
   }, [apiKey]);
 
   /* ───────── Helpers ───────── */
-  const start = () => {
-    // Cast to any so we can pass the silence-timeout override safely
-    (vapiRef.current as any)?.start(assistantId, {
-      timeoutToCustomerSpeechMs: 15000,   // 15-second grace period
-    });
-  };
-
-  const stop = () => vapiRef.current?.stop();
+  const start = () => vapiRef.current?.start(assistantId);
+  const stop  = () => vapiRef.current?.stop();
 
   return { start, stop, amp, status, transcripts };
 }
+
 
 
 
