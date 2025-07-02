@@ -2,35 +2,44 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Vapi from '@vapi-ai/web';
 
 /**
- * React hook that:
- *  • bootstraps a Vapi client
- *  • exposes start()/stop() helpers
- *  • streams live mic amplitude (0-1) for UI animation
+ * Hook that:
+ * ─ bootstraps the Vapi client
+ * ─ exposes start/stop helpers
+ * ─ streams live mic amplitude for UI animation
+ * ─ logs any Vapi-side errors to the console
  */
 export function useVapi(apiKey: string, assistantId: string) {
-  // give useRef an initial null so strict mode is happy
+  // hold the client instance; strict-mode friendly
   const vapiRef = useRef<Vapi | null>(null);
 
   const [transcripts, setTranscripts] = useState<string[]>([]);
   const [status, setStatus] = useState<'idle' | 'calling' | 'ended'>('idle');
-  const [amp, setAmp] = useState(0); // live mic RMS
+  const [amp, setAmp] = useState(0); // mic RMS 0-1
 
-  /* ───────────────  Init Vapi once  ─────────────── */
+  /* ─────────── initialise Vapi once ─────────── */
   useEffect(() => {
-    vapiRef.current = new Vapi(apiKey);
+    const vapi = new Vapi(apiKey);
+    vapiRef.current = vapi;
 
-    vapiRef.current.on('call-start', () => setStatus('calling'));
-    vapiRef.current.on('call-end',   () => setStatus('ended'));
-    vapiRef.current.on('message', (m) => {
+    /* 🔴 catch anything the SDK considers an error */
+    vapi.on('error', (err) => {
+      // err → { action, errorMsg, error, callClientId }
+      console.error('[Vapi error]', err);
+    });
+
+    vapi.on('call-start', () => setStatus('calling'));
+    vapi.on('call-end',   () => setStatus('ended'));
+    vapi.on('message', (m) => {
       if (m.type === 'transcript') {
         setTranscripts((t) => [...t, `${m.role}: ${m.transcript}`]);
       }
     });
 
-    return () => vapiRef.current?.stop();
+    /* tidy up when the component unmounts */
+    return () => vapi.stop();
   }, [apiKey]);
 
-  /* ─────  Mic amplitude for live-pulsing rings  ──── */
+  /* ───── stream mic amplitude for the pulsing rings ───── */
   const initAmplitude = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const ctx = new AudioContext();
@@ -54,7 +63,7 @@ export function useVapi(apiKey: string, assistantId: string) {
     tick();
   }, []);
 
-  /* ─────────────────  public helpers  ────────────── */
+  /* ───────── public helpers ───────── */
   const start = async () => {
     await initAmplitude();
     vapiRef.current?.start(assistantId);
@@ -67,6 +76,7 @@ export function useVapi(apiKey: string, assistantId: string) {
 
   return { start, stop, transcripts, status, amp };
 }
+
 
 
 
