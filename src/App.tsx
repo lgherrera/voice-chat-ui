@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -8,18 +8,14 @@ import { useVapi } from './hooks/useVapi';
 import { VoiceWave } from './components/VoiceWave';
 import { TextChat } from './components/TextChat';
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/*  Environment variables (set in Vercel → Project → Settings)              */
-/*  ─ prefix with VITE_ so Vite exposes them at build-time                  */
-const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY  as string;
-const assistantId = import.meta.env.VITE_VAPI_ASSISTANT_ID as string
-  ?? '5f788679-dd94-4cc5-901f-24daf04d1f48';  // fallback if not set
-/* ────────────────────────────────────────────────────────────────────────── */
+/* -- secrets come from Vercel env -- */
+const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
+const assistantId =
+  import.meta.env.VITE_VAPI_ASSISTANT_ID ??
+  '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 export default function App() {
   const { start, stop, amp } = useVapi(apiKey, assistantId);
-
-  /* local UI state */
   const [chatOpen, setChatOpen] = useState(false);
 
   return (
@@ -36,16 +32,12 @@ export default function App() {
         fontFamily: 'sans-serif',
       }}
     >
-      {/* ────────────────  Header  ──────────────── */}
-      <Typography
-        variant="h4"
-        component="h1"
-        sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}
-      >
+      {/* Header */}
+      <Typography variant="h4" sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}>
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* ────────────────  Main section  ──────────────── */}
+      {/* Main */}
       <Box
         sx={{
           flexGrow: 1,
@@ -55,10 +47,8 @@ export default function App() {
           justifyContent: 'center',
         }}
       >
-        {/* Live-pulsing rings */}
         <VoiceWave amp={amp} />
 
-        {/* Keyboard fallback */}
         <IconButton
           aria-label="Type instead"
           sx={{
@@ -74,7 +64,7 @@ export default function App() {
         </IconButton>
       </Box>
 
-      {/* ────────────────  Footer navigation  ──────────────── */}
+      {/* Footer */}
       <Box sx={{ width: '100%', py: 2 }}>
         <Box
           sx={{
@@ -83,7 +73,6 @@ export default function App() {
             alignItems: 'center',
           }}
         >
-          {/* Chat history placeholder */}
           <IconButton
             aria-label="Chat history"
             sx={{ color: 'grey.500', '&:hover': { color: 'common.white' } }}
@@ -91,7 +80,7 @@ export default function App() {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* Start call */}
+          {/* Start */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -105,11 +94,13 @@ export default function App() {
                 justifyContent: 'center',
               }}
             >
-              <PhoneIcon sx={{ fontSize: { xs: 28, md: 36 }, color: 'primary.main' }} />
+              <PhoneIcon
+                sx={{ fontSize: { xs: 28, md: 36 }, color: 'primary.main' }}
+              />
             </Box>
           </IconButton>
 
-          {/* End call */}
+          {/* Stop */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -135,10 +126,11 @@ export default function App() {
         </Box>
       </Box>
 
-      {/* ────────────────  Slide-up text drawer  ──────────────── */}
+      {/* Text-only drawer */}
       <TextChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </Box>
   );
 }
+
 
 
