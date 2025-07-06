@@ -9,21 +9,19 @@ import { VoiceWave } from './components/VoiceWave';
 import { TextChat } from './components/TextChat';
 import { TranscriptPage } from './components/TranscriptPage';
 
-/* env secrets (set in Vercel) */
+/* env secrets */
 const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 export default function App() {
-  /* Vapi hook */
   const { start, stop, amp, transcripts } = useVapi(apiKey, assistantId);
 
-  /* UI state */
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* -------- transcript history page -------- */
+  /* ---------- transcript history page ---------- */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -33,13 +31,20 @@ export default function App() {
     );
   }
 
-  /* -------- main (home) page -------- */
+  /* ---------------- main page ------------------ */
   return (
     <Box
       sx={{
         bgcolor: 'black',
         color: 'common.white',
         minHeight: '100vh',
+
+        /* phone-shaped bounding box */
+        width: { xs: '100%', sm: 430 },
+        maxWidth: 430,
+        mx: 'auto',
+        boxShadow: { sm: 3 },
+
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -53,7 +58,7 @@ export default function App() {
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Main section */}
+      {/* Main */}
       <Box
         sx={{
           flexGrow: 1,
@@ -65,7 +70,6 @@ export default function App() {
       >
         <VoiceWave amp={amp} />
 
-        {/* keyboard fallback */}
         <IconButton
           sx={{
             mt: 6,
@@ -89,7 +93,7 @@ export default function App() {
             alignItems: 'center',
           }}
         >
-          {/* history icon */}
+          {/* history */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -98,7 +102,7 @@ export default function App() {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* start call */}
+          {/* start */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -118,7 +122,7 @@ export default function App() {
             </Box>
           </IconButton>
 
-          {/* end call */}
+          {/* stop */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -134,7 +138,10 @@ export default function App() {
               }}
             >
               <PhoneIcon
-                sx={{ transform: 'rotate(135deg)', fontSize: { xs: 28, md: 36 } }}
+                sx={{
+                  transform: 'rotate(135deg)',
+                  fontSize: { xs: 28, md: 36 },
+                }}
               />
             </Box>
           </IconButton>
@@ -146,6 +153,7 @@ export default function App() {
     </Box>
   );
 }
+
 
 
 
