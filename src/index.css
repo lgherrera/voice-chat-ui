@@ -22,20 +22,26 @@ a:hover {
   color: #535bf2;
 }
 
-/* -------------------------------------------------
-   BODY: make it a flexbox that truly centers #root
-   ------------------------------------------------- */
+/* ------------ Body ------------ */
 body {
   margin: 0;
-  display: flex;
-  align-items: center;      /* vertical centering  */
-  justify-content: center;  /* horizontal centering */
   min-width: 320px;
   min-height: 100vh;
 }
 
-/* If you prefer vertical centering OFF, just remove align-items */
+/* ------------ Root wrapper ------------ */
+/* 1) stretch full width  2) center its child */
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;  /* horizontal centering */
 
+  /* Uncomment next line if you want vertical centering too
+  align-items: center;
+  */
+}
+
+/* ------------ Headings & buttons (unchanged) ------------ */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -72,4 +78,5 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
 
