@@ -4,7 +4,7 @@ import Vapi from '@vapi-ai/web';
 export function useVapi(apiKey: string, assistantId: string) {
   const vapiRef = useRef<Vapi | null>(null);
 
-  /* UI state */
+  /* UI-state */
   const [amp, setAmp] = useState(0);
   const [status, setStatus] =
     useState<'idle' | 'calling' | 'ended'>('idle');
@@ -15,27 +15,28 @@ export function useVapi(apiKey: string, assistantId: string) {
     const vapi = new Vapi(apiKey);
     vapiRef.current = vapi;
 
-    // @ts-ignore (volume not typed yet)
+    // mic loudness
+    // @ts-ignore (volume missing in .d.ts)
     vapi.on('volume', (v: number) => setAmp(v));
+
     vapi.on('call-start', () => setStatus('calling'));
     vapi.on('call-end',   () => setStatus('ended'));
 
-    /* master listener */
+    /* master listener: log + route messages */
     vapi.on('message', (m) => {
-      console.log('[Vapi message]', m);          //  ← DEBUG every payload
+      console.log('[Vapi message]', m);           // debug
       const o = m as any;
 
-      /* assistant plain-text replies */
+      /* assistant text reply */
       if (
-        (o.type === 'assistant' ||
-         o.type === 'assistant_response' ||
+        (o.type === 'assistant' || o.type === 'assistant_response' ||
          (o.type === 'add-message' && o.role === 'assistant')) &&
         o.text
       ) {
         setTranscripts(t => [...t, `assistant: ${o.text}`]);
       }
 
-      /* final speech transcripts */
+      /* final voice transcript */
       const final =
         o.transcript &&
         (o.transcriptType === 'final' || o.isFinal || o.is_final || o.final);
@@ -55,19 +56,28 @@ export function useVapi(apiKey: string, assistantId: string) {
   const start = () => vapiRef.current?.start(assistantId);
   const stop  = () => vapiRef.current?.stop();
 
-  /** send typed user text to Vapi */
+  /** Send a typed user message. Starts a text-only session if needed. */
   const sendText = (raw: string) => {
     const text = raw.trim();
     if (!text) return;
 
-    setTranscripts(t => [...t, `user: ${text}`]);          // local echo
+    // local echo
+    setTranscripts(t => [...t, `user: ${text}`]);
 
-    /* official text payload */
+    // ensure a session exists
+    if (status === 'idle') {
+      // inputMode:'text' starts a session without grabbing the mic
+      (vapiRef.current as any)?.start(assistantId, { inputMode: 'text' });
+      setStatus('calling');          // local state
+    }
+
+    // send the text message
     (vapiRef.current as any)?.send({ type: 'text', text });
   };
 
   return { start, stop, sendText, amp, status, transcripts };
 }
+
 
 
 
