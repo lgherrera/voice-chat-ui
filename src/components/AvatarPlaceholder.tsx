@@ -1,9 +1,12 @@
 import React from 'react';
-import { Avatar, Box } from '@mui/material';
+import { Box, Avatar } from '@mui/material';
 
 /**
- * A circular avatar that occupies the same footprint
- * as the old VoiceWave (256 / 320 px).
+ * Displays a circular avatar exactly the same size
+ * as the original VoiceWave rings (256 / 320 px).
+ *
+ * To swap the image, just replace /avatar.jpg with
+ * any file you place in /public.
  */
 export const AvatarPlaceholder: React.FC = () => (
   <Box
@@ -16,14 +19,13 @@ export const AvatarPlaceholder: React.FC = () => (
     }}
   >
     <Avatar
+      src="/avatar.jpg"      /* ← path inside /public */
+      alt="User avatar"
       sx={{
         width:  '100%',
         height: '100%',
-        bgcolor: 'grey.800',        /* dark placeholder colour   */
-        fontSize: { xs: 64, md: 80 },
       }}
-    >
-      {/* Initials or icon can go here if you like */}
-    </Avatar>
+    />
   </Box>
 );
+
