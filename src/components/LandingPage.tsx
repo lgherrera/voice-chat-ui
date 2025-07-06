@@ -104,7 +104,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
         </Typography>
         {/* new Spanish description */}
         <Typography variant="body2" color="grey.500">
-          Fanática de los deportes, la vida al aire libre, la buena alimentación, y las amistades.
+          Fanática de los deportes, la vida al aire libre, la buena alimentación, y las amistades duraderas.
         </Typography>
       </Box>
     </Box>
