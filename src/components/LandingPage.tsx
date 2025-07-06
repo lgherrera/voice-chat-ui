@@ -81,19 +81,17 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
         <Typography variant="h5" sx={{ mt: 2 }}>
           Maya, 24
         </Typography>
-
-        {/* NEW description */}
         <Typography variant="body2" color="grey.500">
           Amo los animales, amo mi trabajo, soy tranquila, me gusta leer y ver series en Netflix.
         </Typography>
       </Box>
 
-      {/* Card 2 — static placeholder */}
+      {/* Card 2 — headline + new description */}
       <Box>
         <Box
           component="img"
           src="/img2.jpg"
-          alt="Act-One"
+          alt="Valentina, 23"
           sx={{
             width: '100%',
             height: 'auto',
@@ -102,15 +100,17 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
           }}
         />
         <Typography variant="h5" sx={{ mt: 2 }}>
-          Introducing Act-One
+          Valentina, 23
         </Typography>
+        {/* new Spanish description */}
         <Typography variant="body2" color="grey.500">
-          Research&nbsp;/&nbsp;October&nbsp;22,&nbsp;2024
+          Fanática de los deportes, la vida al aire libre, la buena alimentación, y las amistades.
         </Typography>
       </Box>
     </Box>
   </Box>
 );
+
 
 
 
