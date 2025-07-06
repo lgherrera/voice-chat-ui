@@ -9,19 +9,18 @@ import { AvatarPlaceholder } from './components/AvatarPlaceholder';
 import { TextChat } from './components/TextChat';
 import { TranscriptPage } from './components/TranscriptPage';
 
-/* ───────────────────  ENV  ─────────────────── */
+/* env secrets */
 const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 export default function App() {
-  const { start, stop, amp, transcripts } = useVapi(apiKey, assistantId);
+  const { start, stop, transcripts } = useVapi(apiKey, assistantId);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* ================ History Page ================ */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -31,20 +30,16 @@ export default function App() {
     );
   }
 
-  /* ================ Main Page =================== */
   return (
     <Box
       sx={{
         bgcolor: 'black',
         color: 'common.white',
         minHeight: '100vh',
-
-        /* phone-sized card */
         width: '100%',
         maxWidth: 430,
         mx: 'auto',
         boxShadow: { sm: 3 },
-
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -53,12 +48,11 @@ export default function App() {
         fontFamily: 'sans-serif',
       }}
     >
-      {/* Header */}
       <Typography variant="h4" sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}>
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Main section */}
+      {/* Main */}
       <Box
         sx={{
           flexGrow: 1,
@@ -68,10 +62,8 @@ export default function App() {
           justifyContent: 'center',
         }}
       >
-        {/* Avatar placeholder replaces VoiceWave */}
         <AvatarPlaceholder />
 
-        {/* keyboard fallback */}
         <IconButton
           sx={{
             mt: 6,
@@ -86,7 +78,7 @@ export default function App() {
         </IconButton>
       </Box>
 
-      {/* Footer navigation */}
+      {/* Footer nav */}
       <Box sx={{ width: '100%', py: 2 }}>
         <Box
           sx={{
@@ -95,7 +87,6 @@ export default function App() {
             alignItems: 'center',
           }}
         >
-          {/* history icon */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -104,7 +95,7 @@ export default function App() {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* start call */}
+          {/* start */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -124,7 +115,7 @@ export default function App() {
             </Box>
           </IconButton>
 
-          {/* end call */}
+          {/* stop */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -150,11 +141,11 @@ export default function App() {
         </Box>
       </Box>
 
-      {/* keyboard drawer */}
       <TextChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </Box>
   );
 }
+
 
 
 
