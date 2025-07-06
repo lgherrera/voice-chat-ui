@@ -35,7 +35,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
       }}
     >
       <Typography variant="h5" fontWeight={700}>
-        runway
+        charlare
       </Typography>
 
       <Button
@@ -43,7 +43,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
         sx={{ borderRadius: '32px', px: 3, py: 1 }}
         onClick={onStart}
       >
-        Get&nbsp;Started
+        SUSCRÍBETE
       </Button>
 
       <IconButton sx={{ color: 'white' }}>
@@ -69,20 +69,22 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
       <Box sx={{ cursor: 'pointer' }} onClick={onStart}>
         <Box
           component="img"
-          src="/img1.jpg"                /* put your image in /public */
-          alt="Gen-4"
+          src="/img1.jpg"
+          alt="Maya, 24"
           sx={{
             width: '100%',
-            height: 'auto',             /* natural height */
+            height: 'auto',
             borderRadius: 2,
             display: 'block',
           }}
         />
         <Typography variant="h5" sx={{ mt: 2 }}>
-          Introducing Gen-4
+          Maya, 24
         </Typography>
+
+        {/* NEW description */}
         <Typography variant="body2" color="grey.500">
-          Research&nbsp;/&nbsp;March&nbsp;31,&nbsp;2025
+          Amo los animales, amo mi trabajo, soy tranquila, me gusta leer y ver series en Netflix.
         </Typography>
       </Box>
 
@@ -90,7 +92,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
       <Box>
         <Box
           component="img"
-          src="/img2.jpg"                /* put your image in /public */
+          src="/img2.jpg"
           alt="Act-One"
           sx={{
             width: '100%',
@@ -109,5 +111,6 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => (
     </Box>
   </Box>
 );
+
 
 
