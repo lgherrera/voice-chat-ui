@@ -21,14 +21,14 @@ const assistantId =
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 interface Props {
-  onBack: () => void;   // given by Root in main.tsx
+  onBack: () => void;   // supplied by Root (main.tsx)
 }
 
 export default function App({ onBack }: Props) {
   const {
     start,
     stop,
-    sendText,       // ← new helper for typed chat
+    sendText,         // ← new helper for typed chat
     transcripts,
   } = useVapi(apiKey, assistantId);
 
@@ -41,6 +41,7 @@ export default function App({ onBack }: Props) {
       <TranscriptPage
         transcripts={transcripts}
         onBack={() => setPage('home')}
+        onSend={sendText}                 // pass typing handler
       />
     );
   }
@@ -115,6 +116,7 @@ export default function App({ onBack }: Props) {
             alignItems: 'center',
           }}
         >
+          {/* history icon */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -123,7 +125,7 @@ export default function App({ onBack }: Props) {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* Start call */}
+          {/* start call */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -143,7 +145,7 @@ export default function App({ onBack }: Props) {
             </Box>
           </IconButton>
 
-          {/* End call */}
+          {/* end call */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -178,6 +180,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
