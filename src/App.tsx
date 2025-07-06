@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  IconButton,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -9,18 +14,23 @@ import { AvatarPlaceholder } from './components/AvatarPlaceholder';
 import { TextChat } from './components/TextChat';
 import { TranscriptPage } from './components/TranscriptPage';
 
-/* env secrets */
+/* ───────────────────  ENV  ─────────────────── */
 const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
-export default function App() {
+interface Props {
+  onBack: () => void;   // provided by Root in main.tsx
+}
+
+export default function App({ onBack }: Props) {
   const { start, stop, transcripts } = useVapi(apiKey, assistantId);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
+  /* ─────────────── History page ─────────────── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -30,6 +40,7 @@ export default function App() {
     );
   }
 
+  /* ─────────────── Main page ─────────────── */
   return (
     <Box
       sx={{
@@ -48,11 +59,21 @@ export default function App() {
         fontFamily: 'sans-serif',
       }}
     >
-      <Typography variant="h4" sx={{ mt: { xs: 8, md: 12 }, fontWeight: 300 }}>
+      {/* Back arrow */}
+      <IconButton
+        onClick={onBack}
+        sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
+        aria-label="Back to landing"
+      >
+        <ArrowBackIcon />
+      </IconButton>
+
+      {/* Header */}
+      <Typography variant="h4" sx={{ mb: 2, fontWeight: 300 }}>
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Main */}
+      {/* Main content */}
       <Box
         sx={{
           flexGrow: 1,
@@ -72,13 +93,14 @@ export default function App() {
             '&:hover': { color: 'common.white' },
           }}
           onClick={() => setChatOpen(true)}
+          aria-label="Use keyboard"
         >
           <KeyboardIcon sx={{ fontSize: { xs: 32, md: 40 } }} />
           <Typography variant="body1">Use&nbsp;Keyboard</Typography>
         </IconButton>
       </Box>
 
-      {/* Footer nav */}
+      {/* Footer navigation */}
       <Box sx={{ width: '100%', py: 2 }}>
         <Box
           sx={{
@@ -87,6 +109,7 @@ export default function App() {
             alignItems: 'center',
           }}
         >
+          {/* history */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -95,7 +118,7 @@ export default function App() {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* start */}
+          {/* start call */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -115,7 +138,7 @@ export default function App() {
             </Box>
           </IconButton>
 
-          {/* stop */}
+          {/* end call */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -145,6 +168,7 @@ export default function App() {
     </Box>
   );
 }
+
 
 
 
