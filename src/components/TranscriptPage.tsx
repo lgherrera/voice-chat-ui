@@ -29,13 +29,16 @@ export const TranscriptPage: React.FC<Props> = ({
         sx={{
           position: 'fixed',
           inset: 0,
-          width: { xs: '100%', sm: 430 },
+
+          /* phone card */
+          width: '100%',
           maxWidth: 430,
           mx: 'auto',
+          boxShadow: { sm: 3 },
+
           height: '100vh',
           bgcolor: 'black',
           color: 'white',
-          boxShadow: { sm: 3 },
           p: 2,
           display: 'flex',
           flexDirection: 'column',
@@ -49,7 +52,7 @@ export const TranscriptPage: React.FC<Props> = ({
           <ArrowBackIcon />
         </IconButton>
 
-        {/* scrollable list */}
+        {/* scrollable transcript list */}
         <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
           {transcripts.map((line, i) => (
             <Typography key={i} sx={{ mb: 1 }}>
@@ -62,4 +65,5 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 

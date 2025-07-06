@@ -21,7 +21,7 @@ export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* ---------- transcript history page ---------- */
+  /* ---------------- history page --------------- */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -39,8 +39,8 @@ export default function App() {
         color: 'common.white',
         minHeight: '100vh',
 
-        /* phone-shaped bounding box */
-        width: { xs: '100%', sm: 430 },
+        /* phone card */
+        width: '100%',
         maxWidth: 430,
         mx: 'auto',
         boxShadow: { sm: 3 },
@@ -70,6 +70,7 @@ export default function App() {
       >
         <VoiceWave amp={amp} />
 
+        {/* keyboard fallback */}
         <IconButton
           sx={{
             mt: 6,
@@ -102,7 +103,7 @@ export default function App() {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* start */}
+          {/* start call */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -122,7 +123,7 @@ export default function App() {
             </Box>
           </IconButton>
 
-          {/* stop */}
+          {/* end call */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -153,6 +154,7 @@ export default function App() {
     </Box>
   );
 }
+
 
 
 
