@@ -5,11 +5,11 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
 
 import { useVapi } from './hooks/useVapi';
-import { VoiceWave } from './components/VoiceWave';
+import { AvatarPlaceholder } from './components/AvatarPlaceholder';
 import { TextChat } from './components/TextChat';
 import { TranscriptPage } from './components/TranscriptPage';
 
-/* env secrets */
+/* ───────────────────  ENV  ─────────────────── */
 const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
@@ -21,7 +21,7 @@ export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* ---------------- history page --------------- */
+  /* ================ History Page ================ */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -31,7 +31,7 @@ export default function App() {
     );
   }
 
-  /* ---------------- main page ------------------ */
+  /* ================ Main Page =================== */
   return (
     <Box
       sx={{
@@ -39,7 +39,7 @@ export default function App() {
         color: 'common.white',
         minHeight: '100vh',
 
-        /* phone card */
+        /* phone-sized card */
         width: '100%',
         maxWidth: 430,
         mx: 'auto',
@@ -58,7 +58,7 @@ export default function App() {
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Main */}
+      {/* Main section */}
       <Box
         sx={{
           flexGrow: 1,
@@ -68,7 +68,8 @@ export default function App() {
           justifyContent: 'center',
         }}
       >
-        <VoiceWave amp={amp} />
+        {/* Avatar placeholder replaces VoiceWave */}
+        <AvatarPlaceholder />
 
         {/* keyboard fallback */}
         <IconButton
@@ -85,7 +86,7 @@ export default function App() {
         </IconButton>
       </Box>
 
-      {/* Footer nav */}
+      {/* Footer navigation */}
       <Box sx={{ width: '100%', py: 2 }}>
         <Box
           sx={{
@@ -94,7 +95,7 @@ export default function App() {
             alignItems: 'center',
           }}
         >
-          {/* history */}
+          {/* history icon */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -154,6 +155,7 @@ export default function App() {
     </Box>
   );
 }
+
 
 
 
