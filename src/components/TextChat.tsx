@@ -9,18 +9,21 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-export const TextChat: React.FC<{ open: boolean; onClose: () => void }> = ({
-  open,
-  onClose,
-}) => {
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  onSend?: (text: string) => void;   // ← NEW
+}
+
+export const TextChat: React.FC<Props> = ({ open, onClose, onSend }) => {
   const [lines, setLines] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
 
   const send = () => {
     if (!draft.trim()) return;
-    setLines((l) => [...l, `Me: ${draft}`]);
+    setLines(l => [...l, `Me: ${draft}`]);
+    onSend?.(draft);           // 🔗 forward to Vapi
     setDraft('');
-    /* ⇢ hook here to a text-chat backend if desired */
   };
 
   return (
@@ -28,12 +31,13 @@ export const TextChat: React.FC<{ open: boolean; onClose: () => void }> = ({
       <Paper
         sx={{
           position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          inset: 0,
+          width: { xs: '100%', sm: 430 },
+          maxWidth: 430,
+          mx: 'auto',
           height: 300,
           bgcolor: 'grey.900',
-          color: 'common.white',
+          color: 'white',
           p: 2,
           borderTopLeftRadius: 16,
           borderTopRightRadius: 16,
@@ -41,16 +45,14 @@ export const TextChat: React.FC<{ open: boolean; onClose: () => void }> = ({
           flexDirection: 'column',
         }}
       >
-        {/* message list */}
         <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 1 }}>
-          {lines.map((l, idx) => (
-            <Typography key={idx} sx={{ mb: 0.5 }}>
+          {lines.map((l, i) => (
+            <Typography key={i} sx={{ mb: 0.5 }}>
               {l}
             </Typography>
           ))}
         </Box>
 
-        {/* input row */}
         <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
             fullWidth
@@ -71,4 +73,5 @@ export const TextChat: React.FC<{ open: boolean; onClose: () => void }> = ({
     </Slide>
   );
 };
+
 

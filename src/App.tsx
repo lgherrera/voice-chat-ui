@@ -21,16 +21,21 @@ const assistantId =
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 interface Props {
-  onBack: () => void;   // provided by Root in main.tsx
+  onBack: () => void;   // given by Root in main.tsx
 }
 
 export default function App({ onBack }: Props) {
-  const { start, stop, transcripts } = useVapi(apiKey, assistantId);
+  const {
+    start,
+    stop,
+    sendText,       // ← new helper for typed chat
+    transcripts,
+  } = useVapi(apiKey, assistantId);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* ─────────────── History page ─────────────── */
+  /* ────────── Transcript History page ────────── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -40,7 +45,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ─────────────── Main page ─────────────── */
+  /* ────────────── Main voice page ────────────── */
   return (
     <Box
       sx={{
@@ -59,7 +64,7 @@ export default function App({ onBack }: Props) {
         fontFamily: 'sans-serif',
       }}
     >
-      {/* Back arrow */}
+      {/* Back arrow to Landing */}
       <IconButton
         onClick={onBack}
         sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
@@ -73,7 +78,7 @@ export default function App({ onBack }: Props) {
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Main content */}
+      {/* Central avatar */}
       <Box
         sx={{
           flexGrow: 1,
@@ -85,6 +90,7 @@ export default function App({ onBack }: Props) {
       >
         <AvatarPlaceholder />
 
+        {/* keyboard drawer trigger */}
         <IconButton
           sx={{
             mt: 6,
@@ -93,7 +99,7 @@ export default function App({ onBack }: Props) {
             '&:hover': { color: 'common.white' },
           }}
           onClick={() => setChatOpen(true)}
-          aria-label="Use keyboard"
+          aria-label="Use keyboard input"
         >
           <KeyboardIcon sx={{ fontSize: { xs: 32, md: 40 } }} />
           <Typography variant="body1">Use&nbsp;Keyboard</Typography>
@@ -109,7 +115,6 @@ export default function App({ onBack }: Props) {
             alignItems: 'center',
           }}
         >
-          {/* history */}
           <IconButton
             aria-label="Chat history"
             onClick={() => setPage('history')}
@@ -118,7 +123,7 @@ export default function App({ onBack }: Props) {
             <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
           </IconButton>
 
-          {/* start call */}
+          {/* Start call */}
           <IconButton aria-label="Start call" onClick={start}>
             <Box
               sx={{
@@ -138,7 +143,7 @@ export default function App({ onBack }: Props) {
             </Box>
           </IconButton>
 
-          {/* end call */}
+          {/* End call */}
           <IconButton aria-label="End call" onClick={stop}>
             <Box
               sx={{
@@ -164,10 +169,16 @@ export default function App({ onBack }: Props) {
         </Box>
       </Box>
 
-      <TextChat open={chatOpen} onClose={() => setChatOpen(false)} />
+      {/* Keyboard drawer */}
+      <TextChat
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        onSend={sendText}       // ← wired to Vapi
+      />
     </Box>
   );
 }
+
 
 
 
