@@ -15,8 +15,9 @@ interface Props {
   onSend?: (text: string) => void;
 }
 
+/* Profile-specific constants */
 const persona    = 'Maya';
-const background = '/maya-bg.jpg';            // located in /public
+const background = '/maya-bg.jpg';     // image in /public
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -38,7 +39,7 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const barHeightPx = 72;        // composer bar height for padding
+  const barHeightPx = 72; // composer bar height
 
   return (
     <Slide direction="left" in>
@@ -56,7 +57,7 @@ export const TranscriptPage: React.FC<Props> = ({
           color: 'white',
         }}
       >
-        {/* blurred background */}
+        {/* Background image with 0.8 opacity (no blur) */}
         <Box
           sx={{
             position: 'absolute',
@@ -64,15 +65,16 @@ export const TranscriptPage: React.FC<Props> = ({
             backgroundImage: `url(${background})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'blur(1px)',            // ← 1 px blur
+            opacity: 0.8,            // ← opacity instead of blur
             zIndex: -2,
           }}
         />
+        {/* Slight dark overlay for legibility */}
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
-            bgcolor: 'rgba(0,0,0,0.35)',
+            bgcolor: 'rgba(0,0,0,0.30)',
             zIndex: -1,
           }}
         />
@@ -154,7 +156,7 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* Composer bar (10 % up) */}
+        {/* Composer bar (10 % above bottom) */}
         <Box
           sx={{
             position: 'absolute',
@@ -200,6 +202,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
