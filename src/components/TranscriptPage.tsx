@@ -10,14 +10,13 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 
 interface Props {
-  transcripts: string[];        // lines like "user: hi", "assistant: hello"
+  transcripts: string[];
   onBack: () => void;
   onSend?: (text: string) => void;
 }
 
-/* Swap these when profile changes */
 const persona    = 'Maya';
-const background = '/maya-bg.jpg';   // put this in /public
+const background = '/maya-bg.jpg';            // located in /public
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -39,7 +38,7 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const barHeightPx = 72; // ≈ 12 + 48 + 12 padding + button
+  const barHeightPx = 72;        // composer bar height for padding
 
   return (
     <Slide direction="left" in>
@@ -57,7 +56,7 @@ export const TranscriptPage: React.FC<Props> = ({
           color: 'white',
         }}
       >
-        {/* Blurred background */}
+        {/* blurred background */}
         <Box
           sx={{
             position: 'absolute',
@@ -65,7 +64,7 @@ export const TranscriptPage: React.FC<Props> = ({
             backgroundImage: `url(${background})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'blur(2px)',          // ← 2 px blur
+            filter: 'blur(1px)',            // ← 1 px blur
             zIndex: -2,
           }}
         />
@@ -78,7 +77,7 @@ export const TranscriptPage: React.FC<Props> = ({
           }}
         />
 
-        {/* ───────── Header ───────── */}
+        {/* Header */}
         <Box
           sx={{
             position: 'relative',
@@ -114,31 +113,31 @@ export const TranscriptPage: React.FC<Props> = ({
           </Typography>
         </Box>
 
-        {/* ───────── Chat scroll area ───────── */}
+        {/* Chat area */}
         <Box
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
             px: 2,
-            pb: `${barHeightPx + 16}px`, // keep last bubble clear
+            pb: `${barHeightPx + 16}px`,
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
           }}
         >
-          {transcripts.map((line, idx) => {
+          {transcripts.map((line, i) => {
             const user = isUser(line);
             const text = line.replace(/^(user|assistant):\s*/, '');
 
             return (
               <Box
-                key={idx}
+                key={i}
                 sx={{
                   maxWidth: '80%',
                   alignSelf: user ? 'flex-end' : 'flex-start',
                   bgcolor: user
-                    ? 'rgba(255,255,255,0.2)'      // user bubble
-                    : 'rgba(255,230,221,0.9)',     // assistant bubble
+                    ? 'rgba(255,255,255,0.2)'
+                    : 'rgba(255,230,221,0.9)',
                   color: user ? 'white' : 'black',
                   px: 1.5,
                   py: 1,
@@ -155,13 +154,13 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* ───────── Composer bar (10 % up) ───────── */}
+        {/* Composer bar (10 % up) */}
         <Box
           sx={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: '10%',                  // ← 10 % up
+            bottom: '10%',
             display: 'flex',
             gap: 1,
             p: 1.5,
@@ -201,6 +200,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
