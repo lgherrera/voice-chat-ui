@@ -1,19 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Slide,
-  Paper,
   Box,
   IconButton,
-  Typography,
   TextField,
+  Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SendIcon from '@mui/icons-material/Send';
 
 interface Props {
-  transcripts: string[];
+  transcripts: string[];      // ["user: hi", "assistant: hello"]
   onBack: () => void;
-  onSend?: (text: string) => void;          // ← NEW
+  onSend?: (text: string) => void;
 }
+
+/* hard-coded persona & background — swap when profile changes */
+const persona      = 'Maya';
+const background   = '/maya-bg.jpg';   // file in /public
+
+/* quick util: who spoke? */
+const isUser = (line: string) => line.startsWith('user:');
 
 export const TranscriptPage: React.FC<Props> = ({
   transcripts,
@@ -35,7 +42,8 @@ export const TranscriptPage: React.FC<Props> = ({
 
   return (
     <Slide direction="left" in>
-      <Paper
+      {/* root container */}
+      <Box
         sx={{
           position: 'fixed',
           inset: 0,
@@ -43,50 +51,151 @@ export const TranscriptPage: React.FC<Props> = ({
           maxWidth: 430,
           mx: 'auto',
           height: '100vh',
-          bgcolor: 'black',
-          color: 'white',
-          boxShadow: { sm: 3 },
-          p: 2,
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          color: 'white',
         }}
       >
-        {/* back arrow */}
-        <IconButton
-          onClick={onBack}
-          sx={{ color: 'grey.300', mb: 1, alignSelf: 'flex-start' }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
+        {/* blurred BG image */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${background})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(8px)',
+            zIndex: -2,
+          }}
+        />
+        {/* dark overlay for readability */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            bgcolor: 'rgba(0,0,0,0.35)',
+            zIndex: -1,
+          }}
+        />
 
-        {/* scrollable transcript list */}
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', mb: 1 }}>
-          {transcripts.map((line, i) => (
-            <Typography key={i} sx={{ mb: 1 }}>
-              {line}
+        {/* ───────── Header ───────── */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            p: 1.5,
+          }}
+        >
+          <IconButton
+            onClick={onBack}
+            sx={{
+              bgcolor: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(4px)',
+              color: 'white',
+              width: 36,
+              height: 36,
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+
+          <Box>
+            <Typography variant="h6" fontWeight={600}>
+              {persona}
             </Typography>
-          ))}
+            <Typography
+              variant="caption"
+              sx={{ color: 'springgreen' }}
+            >
+              Online
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* ───────── Chat scroll area ───────── */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            overflowY: 'auto',
+            px: 2,
+            pb: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5,
+          }}
+        >
+          {transcripts.map((line, idx) => {
+            const user = isUser(line);
+            const text = line.replace(/^(user|assistant):\s*/, '');
+
+            return (
+              <Box
+                key={idx}
+                sx={{
+                  maxWidth: '80%',
+                  alignSelf: user ? 'flex-end' : 'flex-start',
+                  bgcolor: user
+                    ? 'rgba(255,255,255,0.2)'
+                    : 'rgba(255,230,221,0.9)',
+                  color: user ? 'white' : 'black',
+                  px: 1.5,
+                  py: 1,
+                  borderRadius: 2,
+                  borderBottomRightRadius: user ? 0 : 2,
+                  borderBottomLeftRadius: user ? 2 : 0,
+                  backdropFilter: 'blur(2px)',
+                }}
+              >
+                <Typography variant="body2">{text}</Typography>
+              </Box>
+            );
+          })}
           <div ref={bottomRef} />
         </Box>
 
-        {/* text input bar */}
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        {/* ───────── Composer bar ───────── */}
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            p: 1.5,
+            backdropFilter: 'blur(10px)',
+            bgcolor: 'rgba(0,0,0,0.4)',
+          }}
+        >
           <TextField
             fullWidth
+            variant="filled"
             size="small"
-            variant="outlined"
+            placeholder="Message"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && send()}
-            placeholder="Escribe tu mensaje…"
+            sx={{
+              input: { color: 'white' },
+              bgcolor: 'rgba(255,255,255,0.15)',
+              borderRadius: 2,
+            }}
           />
-          <IconButton onClick={send} aria-label="Send" sx={{ color: 'white' }}>
-            ➤
+          <IconButton
+            onClick={send}
+            sx={{
+              bgcolor: '#ff4da6',
+              color: 'white',
+              '&:hover': { bgcolor: '#ff2b91' },
+              width: 48,
+              height: 48,
+            }}
+          >
+            <SendIcon />
           </IconButton>
         </Box>
-      </Paper>
+      </Box>
     </Slide>
   );
 };
+
 
 
