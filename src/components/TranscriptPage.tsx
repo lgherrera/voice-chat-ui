@@ -10,16 +10,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 
 interface Props {
-  transcripts: string[];      // ["user: hi", "assistant: hello"]
+  transcripts: string[];             // e.g. ["user: hi", "assistant: hello"]
   onBack: () => void;
-  onSend?: (text: string) => void;
+  onSend?: (text: string) => void;   // called when user presses Enter / send
 }
 
-/* hard-coded persona & background — swap when profile changes */
-const persona      = 'Maya';
-const background   = '/maya-bg.jpg';   // file in /public
+/* Persona + background (swap when profile changes) */
+const persona    = 'Maya';
+const background = '/maya-bg.jpg';   // file lives in /public
 
-/* quick util: who spoke? */
+/* helper */
 const isUser = (line: string) => line.startsWith('user:');
 
 export const TranscriptPage: React.FC<Props> = ({
@@ -42,7 +42,7 @@ export const TranscriptPage: React.FC<Props> = ({
 
   return (
     <Slide direction="left" in>
-      {/* root container */}
+      {/* Root wrapper (phone card) */}
       <Box
         sx={{
           position: 'fixed',
@@ -57,7 +57,7 @@ export const TranscriptPage: React.FC<Props> = ({
           color: 'white',
         }}
       >
-        {/* blurred BG image */}
+        {/* blurred background */}
         <Box
           sx={{
             position: 'absolute',
@@ -65,11 +65,11 @@ export const TranscriptPage: React.FC<Props> = ({
             backgroundImage: `url(${background})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            filter: 'blur(8px)',
+            filter: 'blur(6px)',          // ← 6 px blur
             zIndex: -2,
           }}
         />
-        {/* dark overlay for readability */}
+        {/* dark overlay */}
         <Box
           sx={{
             position: 'absolute',
@@ -82,15 +82,22 @@ export const TranscriptPage: React.FC<Props> = ({
         {/* ───────── Header ───────── */}
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
+            position: 'relative',
             p: 1.5,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
+          {/* back arrow (anchored left) */}
           <IconButton
             onClick={onBack}
             sx={{
+              position: 'absolute',
+              left: 8,
+              top: '50%',
+              transform: 'translateY(-50%)',
               bgcolor: 'rgba(0,0,0,0.35)',
               backdropFilter: 'blur(4px)',
               color: 'white',
@@ -101,17 +108,13 @@ export const TranscriptPage: React.FC<Props> = ({
             <ArrowBackIcon />
           </IconButton>
 
-          <Box>
-            <Typography variant="h6" fontWeight={600}>
-              {persona}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{ color: 'springgreen' }}
-            >
-              Online
-            </Typography>
-          </Box>
+          {/* centered persona name + status */}
+          <Typography variant="h5" fontWeight={600}>
+            {persona}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'springgreen' }}>
+            Online
+          </Typography>
         </Box>
 
         {/* ───────── Chat scroll area ───────── */}
@@ -137,8 +140,8 @@ export const TranscriptPage: React.FC<Props> = ({
                   maxWidth: '80%',
                   alignSelf: user ? 'flex-end' : 'flex-start',
                   bgcolor: user
-                    ? 'rgba(255,255,255,0.2)'
-                    : 'rgba(255,230,221,0.9)',
+                    ? 'rgba(255,255,255,0.2)'      // user bubble
+                    : 'rgba(255,230,221,0.9)',     // assistant bubble
                   color: user ? 'white' : 'black',
                   px: 1.5,
                   py: 1,
@@ -182,12 +185,13 @@ export const TranscriptPage: React.FC<Props> = ({
           <IconButton
             onClick={send}
             sx={{
-              bgcolor: '#ff4da6',
+              bgcolor: 'black',        // ← black button
               color: 'white',
-              '&:hover': { bgcolor: '#ff2b91' },
+              '&:hover': { bgcolor: '#333' },
               width: 48,
               height: 48,
             }}
+            aria-label="Send"
           >
             <SendIcon />
           </IconButton>
@@ -196,6 +200,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
