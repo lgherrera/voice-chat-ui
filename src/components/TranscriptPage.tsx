@@ -17,7 +17,7 @@ interface Props {
 }
 
 const persona = 'Maya';
-const background = '/maya-bg.jpg';
+const background = '/maya-bg.jpg'; // image in /public
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -39,26 +39,27 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
+  const barHeightPx = 72;
+
   return (
     <Slide direction="left" in>
       <Box
         sx={{
-          position: 'relative',
+          position: 'fixed',
           inset: 0,
           width: '100%',
           maxWidth: 430,
           mx: 'auto',
-          height: '100dvh',
+          height: '100dvh', // ← critical for mobile view
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           color: 'white',
         }}
       >
-        {/* Background layers */}
+        {/* background image */}
         <Box
           sx={{
-            pointerEvents: 'none',
             position: 'absolute',
             inset: 0,
             backgroundImage: `url(${background})`,
@@ -70,7 +71,6 @@ export const TranscriptPage: React.FC<Props> = ({
         />
         <Box
           sx={{
-            pointerEvents: 'none',
             position: 'absolute',
             inset: 0,
             bgcolor: 'rgba(0,0,0,0.30)',
@@ -87,7 +87,6 @@ export const TranscriptPage: React.FC<Props> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 5,
           }}
         >
           <IconButton
@@ -98,6 +97,7 @@ export const TranscriptPage: React.FC<Props> = ({
               top: '50%',
               transform: 'translateY(-50%)',
               bgcolor: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(4px)',
               color: 'white',
               width: 36,
               height: 36,
@@ -107,17 +107,18 @@ export const TranscriptPage: React.FC<Props> = ({
           </IconButton>
 
           <IconButton
-            aria-label="Phone"
             sx={{
               position: 'absolute',
               right: 16,
               top: '50%',
               transform: 'translateY(-50%)',
               bgcolor: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(4px)',
               color: 'white',
               width: 36,
               height: 36,
             }}
+            aria-label="Phone"
           >
             <PhoneIcon />
           </IconButton>
@@ -130,13 +131,13 @@ export const TranscriptPage: React.FC<Props> = ({
           </Typography>
         </Box>
 
-        {/* Chat area */}
+        {/* Chat scroll area */}
         <Box
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
             px: 2,
-            pb: '96px',
+            pb: `${barHeightPx + 16}px`,
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
@@ -171,63 +172,53 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* Message composer (now absolutely positioned) */}
+        {/* Composer */}
         <Box
           sx={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: 'env(safe-area-inset-bottom)',
-            px: 1.5,
-            zIndex: 10,
+            bottom: '10%',
+            display: 'flex',
+            gap: 1,
+            p: 1.5,
+            backdropFilter: 'blur(10px)',
+            bgcolor: 'rgba(0,0,0,0.4)',
           }}
         >
-          <Box
+          <TextField
+            fullWidth
+            variant="filled"
+            size="small"
+            placeholder="Message"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && send()}
             sx={{
-              display: 'flex',
-              gap: 1,
-              backdropFilter: 'blur(10px)',
-              bgcolor: 'rgba(0,0,0,0.4)',
-              alignItems: 'center',
+              input: { color: 'white' },
+              bgcolor: 'rgba(255,255,255,0.15)',
               borderRadius: 2,
-              px: 1.5,
-              py: 1.25,
+            }}
+          />
+          <IconButton
+            onClick={send}
+            aria-label="Send"
+            sx={{
+              bgcolor: 'black',
+              color: 'white',
+              '&:hover': { bgcolor: '#333' },
+              width: 48,
+              height: 48,
             }}
           >
-            <TextField
-              fullWidth
-              variant="filled"
-              size="small"
-              placeholder="Message"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && send()}
-              sx={{
-                input: { color: 'white' },
-                bgcolor: 'rgba(255,255,255,0.15)',
-                borderRadius: 2,
-              }}
-            />
-
-            <IconButton
-              onClick={send}
-              aria-label="Send"
-              sx={{
-                bgcolor: 'black',
-                color: 'white',
-                '&:hover': { bgcolor: '#333' },
-                width: 48,
-                height: 48,
-              }}
-            >
-              <SendIcon />
-            </IconButton>
-          </Box>
+            <SendIcon />
+          </IconButton>
         </Box>
       </Box>
     </Slide>
   );
 };
+
 
 
 
