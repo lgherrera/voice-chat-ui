@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PhoneIcon from '@mui/icons-material/Phone';      // ← NEW
 import SendIcon from '@mui/icons-material/Send';
 
 interface Props {
@@ -15,9 +16,8 @@ interface Props {
   onSend?: (text: string) => void;
 }
 
-/* Profile-specific constants */
 const persona    = 'Maya';
-const background = '/maya-bg.jpg';     // image in /public
+const background = '/maya-bg.jpg';
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -29,9 +29,9 @@ export const TranscriptPage: React.FC<Props> = ({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [transcripts]);
+  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
+    transcripts,
+  ]);
 
   const send = () => {
     if (!draft.trim()) return;
@@ -39,7 +39,7 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const barHeightPx = 72; // composer bar height
+  const barHeightPx = 72;
 
   return (
     <Slide direction="left" in>
@@ -57,7 +57,7 @@ export const TranscriptPage: React.FC<Props> = ({
           color: 'white',
         }}
       >
-        {/* Background image with 0.8 opacity (no blur) */}
+        {/* Background + overlay */}
         <Box
           sx={{
             position: 'absolute',
@@ -65,11 +65,10 @@ export const TranscriptPage: React.FC<Props> = ({
             backgroundImage: `url(${background})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.8,            // ← opacity instead of blur
+            opacity: 0.8,
             zIndex: -2,
           }}
         />
-        {/* Slight dark overlay for legibility */}
         <Box
           sx={{
             position: 'absolute',
@@ -79,7 +78,7 @@ export const TranscriptPage: React.FC<Props> = ({
           }}
         />
 
-        {/* Header */}
+        {/* ───────── Header ───────── */}
         <Box
           sx={{
             position: 'relative',
@@ -90,6 +89,7 @@ export const TranscriptPage: React.FC<Props> = ({
             justifyContent: 'center',
           }}
         >
+          {/* Back arrow (left) */}
           <IconButton
             onClick={onBack}
             sx={{
@@ -107,6 +107,25 @@ export const TranscriptPage: React.FC<Props> = ({
             <ArrowBackIcon />
           </IconButton>
 
+          {/* Phone icon (right) */}
+          <IconButton
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              bgcolor: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(4px)',
+              color: 'white',
+              width: 36,
+              height: 36,
+            }}
+            aria-label="Phone"
+          >
+            <PhoneIcon />
+          </IconButton>
+
+          {/* Centered persona */}
           <Typography variant="h5" fontWeight={600}>
             {persona}
           </Typography>
@@ -127,10 +146,9 @@ export const TranscriptPage: React.FC<Props> = ({
             gap: 1.5,
           }}
         >
-          {transcripts.map((line, i) => {
-            const user = isUser(line);
-            const text = line.replace(/^(user|assistant):\s*/, '');
-
+          {transcripts.map((l, i) => {
+            const user = isUser(l);
+            const text = l.replace(/^(user|assistant):\s*/, '');
             return (
               <Box
                 key={i}
@@ -156,7 +174,7 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* Composer bar (10 % above bottom) */}
+        {/* Composer bar (10 % up) */}
         <Box
           sx={{
             position: 'absolute',
@@ -202,6 +220,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
