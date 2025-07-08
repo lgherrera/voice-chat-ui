@@ -17,7 +17,7 @@ interface Props {
 }
 
 const persona    = 'Maya';
-const background = '/maya-bg.jpg';   // put image in /public
+const background = '/maya-bg.jpg';      // image in /public
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -30,9 +30,9 @@ export const TranscriptPage: React.FC<Props> = ({
   const [draft, setDraft] = useState('');
 
   /* auto-scroll to newest bubble */
-  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
-    transcripts,
-  ]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcripts]);
 
   const send = () => {
     if (!draft.trim()) return;
@@ -40,199 +40,203 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const barHeightPx = 72;            // composer height for bottom padding
+  const barHeightPx = 72;               // composer height for padding
 
   return (
     <Slide direction="left" in mountOnEnter unmountOnExit>
-      <Box
-        sx={{
-          position: 'fixed',
-          inset: 0,
-          width: '100%',
-          maxWidth: 430,
-          mx: 'auto',
-          height: '100dvh',          // mobile-safe full height
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          color: 'white',
-        }}
-      >
-        {/* ───────── Background ───────── */}
+      <>  {/* <-- React fragment so Slide has a single child */}
+        {/* ───────── Full-page container ───────── */}
         <Box
           sx={{
-            position: 'absolute',
+            position: 'fixed',
             inset: 0,
-            backgroundImage: `url(${background})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.8,
-            zIndex: -2,
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            bgcolor: 'rgba(0,0,0,0.30)',
-            zIndex: -1,
-          }}
-        />
-
-        {/* ───────── Header ───────── */}
-        <Box
-          sx={{
-            position: 'relative',
-            p: 1.5,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <IconButton
-            onClick={onBack}
-            sx={{
-              position: 'absolute',
-              left: 16,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              bgcolor: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(4px)',
-              color: 'white',
-              width: 36,
-              height: 36,
-            }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-
-          <IconButton
-            aria-label="Phone"
-            sx={{
-              position: 'absolute',
-              right: 16,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              bgcolor: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(4px)',
-              color: 'white',
-              width: 36,
-              height: 36,
-            }}
-          >
-            <PhoneIcon />
-          </IconButton>
-
-          <Typography variant="h5" fontWeight={600}>
-            {persona}
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'springgreen' }}>
-            Online
-          </Typography>
-        </Box>
-
-        {/* ───────── Chat scroll area ───────── */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: 'auto',
-            px: 2,
-            pb: `${barHeightPx + 16}px`, // keep last bubble clear of composer
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1.5,
-          }}
-        >
-          {transcripts.map((line, i) => {
-            const user = isUser(line);
-            const text = line.replace(/^(user|assistant):\s*/, '');
-
-            return (
-              <Box
-                key={i}
-                sx={{
-                  maxWidth: '80%',
-                  alignSelf: user ? 'flex-end' : 'flex-start',
-                  bgcolor: user
-                    ? 'rgba(255,255,255,0.2)'
-                    : 'rgba(255,230,221,0.9)',
-                  color: user ? 'white' : 'black',
-                  px: 1.5,
-                  py: 1,
-                  borderRadius: 2,
-                  borderBottomRightRadius: user ? 0 : 2,
-                  borderBottomLeftRadius: user ? 2 : 0,
-                  backdropFilter: 'blur(2px)',
-                }}
-              >
-                <Typography variant="body2">{text}</Typography>
-              </Box>
-            );
-          })}
-          <div ref={bottomRef} />
-        </Box>
-      </Box>
-
-      {/* ───────── Message composer (viewport-wide, centered) ───────── */}
-      <Box
-        sx={{
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 'env(safe-area-inset-bottom)',
-          display: 'flex',
-          justifyContent: 'center',
-          zIndex: 2000,
-          pointerEvents: 'none',        // let inner bar handle clicks
-        }}
-      >
-        <Box
-          sx={{
             width: '100%',
             maxWidth: 430,
             mx: 'auto',
+            height: '100dvh',           // dynamic viewport height
+            overflow: 'hidden',
             display: 'flex',
-            gap: 1,
-            p: 1.5,
-            bgcolor: 'rgba(0,0,0,0.4)',
-            backdropFilter: 'blur(10px)',
-            alignItems: 'center',
-            pointerEvents: 'auto',
+            flexDirection: 'column',
+            color: 'white',
           }}
         >
-          <TextField
-            fullWidth
-            variant="filled"
-            size="small"
-            placeholder="Message"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && send()}
+          {/* Background image + overlay */}
+          <Box
             sx={{
-              input: { color: 'white' },
-              bgcolor: 'rgba(255,255,255,0.15)',
-              borderRadius: 2,
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: `url(${background})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: 0.8,
+              zIndex: -2,
             }}
           />
-          <IconButton
-            onClick={send}
-            aria-label="Send"
+          <Box
             sx={{
-              bgcolor: 'black',
-              color: 'white',
-              '&:hover': { bgcolor: '#333' },
-              width: 48,
-              height: 48,
+              position: 'absolute',
+              inset: 0,
+              bgcolor: 'rgba(0,0,0,0.30)',
+              zIndex: -1,
+            }}
+          />
+
+          {/* Header */}
+          <Box
+            sx={{
+              position: 'relative',
+              p: 1.5,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <SendIcon />
-          </IconButton>
+            <IconButton
+              onClick={onBack}
+              sx={{
+                position: 'absolute',
+                left: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                bgcolor: 'rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(4px)',
+                color: 'white',
+                width: 36,
+                height: 36,
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+
+            <IconButton
+              aria-label="Phone"
+              sx={{
+                position: 'absolute',
+                right: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                bgcolor: 'rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(4px)',
+                color: 'white',
+                width: 36,
+                height: 36,
+              }}
+            >
+              <PhoneIcon />
+            </IconButton>
+
+            <Typography variant="h5" fontWeight={600}>
+              {persona}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'springgreen' }}>
+              Online
+            </Typography>
+          </Box>
+
+          {/* Chat scroll area */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: 'auto',
+              px: 2,
+              pb: `${barHeightPx + 16}px`,   // keep last bubble above composer
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.5,
+            }}
+          >
+            {transcripts.map((line, i) => {
+              const user = isUser(line);
+              const text = line.replace(/^(user|assistant):\s*/, '');
+
+              return (
+                <Box
+                  key={i}
+                  sx={{
+                    maxWidth: '80%',
+                    alignSelf: user ? 'flex-end' : 'flex-start',
+                    bgcolor: user
+                      ? 'rgba(255,255,255,0.2)'
+                      : 'rgba(255,230,221,0.9)',
+                    color: user ? 'white' : 'black',
+                    px: 1.5,
+                    py: 1,
+                    borderRadius: 2,
+                    borderBottomRightRadius: user ? 0 : 2,
+                    borderBottomLeftRadius: user ? 2 : 0,
+                    backdropFilter: 'blur(2px)',
+                  }}
+                >
+                  <Typography variant="body2">{text}</Typography>
+                </Box>
+              );
+            })}
+            <div ref={bottomRef} />
+          </Box>
         </Box>
-      </Box>
+
+        {/* ───────── Composer (viewport-wide, centered) ───────── */}
+        <Box
+          sx={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 'env(safe-area-inset-bottom)',
+            display: 'flex',
+            justifyContent: 'center',
+            zIndex: 2000,
+            pointerEvents: 'none',       // gutter is non-interactive
+          }}
+        >
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: 430,
+              mx: 'auto',
+              display: 'flex',
+              gap: 1,
+              p: 1.5,
+              bgcolor: 'rgba(0,0,0,0.4)',
+              backdropFilter: 'blur(10px)',
+              alignItems: 'center',
+              pointerEvents: 'auto',     // bar handles clicks
+            }}
+          >
+            <TextField
+              fullWidth
+              variant="filled"
+              size="small"
+              placeholder="Message"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && send()}
+              sx={{
+                input: { color: 'white' },
+                bgcolor: 'rgba(255,255,255,0.15)',
+                borderRadius: 2,
+              }}
+            />
+            <IconButton
+              onClick={send}
+              aria-label="Send"
+              sx={{
+                bgcolor: 'black',
+                color: 'white',
+                '&:hover': { bgcolor: '#333' },
+                width: 48,
+                height: 48,
+              }}
+            >
+              <SendIcon />
+            </IconButton>
+          </Box>
+        </Box>
+      </>
     </Slide>
   );
 };
+
 
 
 
