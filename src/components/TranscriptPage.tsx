@@ -18,7 +18,7 @@ interface Props {
 
 /* Profile-specific */
 const persona    = 'Maya';
-const background = '/maya-bg.jpg';     // put this in /public
+const background = '/maya-bg.jpg';   // image in /public
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -30,6 +30,7 @@ export const TranscriptPage: React.FC<Props> = ({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
 
+  /* auto-scroll to newest bubble */
   useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
     transcripts,
   ]);
@@ -58,7 +59,7 @@ export const TranscriptPage: React.FC<Props> = ({
           color: 'white',
         }}
       >
-        {/* BG image with opacity */}
+        {/* background image with 0.8 opacity */}
         <Box
           sx={{
             position: 'absolute',
@@ -70,7 +71,7 @@ export const TranscriptPage: React.FC<Props> = ({
             zIndex: -2,
           }}
         />
-        {/* dark overlay */}
+        {/* dark overlay for contrast */}
         <Box
           sx={{
             position: 'absolute',
@@ -91,12 +92,12 @@ export const TranscriptPage: React.FC<Props> = ({
             justifyContent: 'center',
           }}
         >
-          {/* back arrow */}
+          {/* back arrow (left) */}
           <IconButton
             onClick={onBack}
             sx={{
               position: 'absolute',
-              left: 12,                       // ← 12 px
+              left: 16,                      // ← 16 px from left
               top: '50%',
               transform: 'translateY(-50%)',
               bgcolor: 'rgba(0,0,0,0.35)',
@@ -109,11 +110,11 @@ export const TranscriptPage: React.FC<Props> = ({
             <ArrowBackIcon />
           </IconButton>
 
-          {/* phone icon */}
+          {/* phone icon (right) */}
           <IconButton
             sx={{
               position: 'absolute',
-              right: 12,                      // ← 12 px
+              right: 16,                     // ← 16 px from right
               top: '50%',
               transform: 'translateY(-50%)',
               bgcolor: 'rgba(0,0,0,0.35)',
@@ -127,6 +128,7 @@ export const TranscriptPage: React.FC<Props> = ({
             <PhoneIcon />
           </IconButton>
 
+          {/* centered persona + status */}
           <Typography variant="h5" fontWeight={600}>
             {persona}
           </Typography>
@@ -135,13 +137,13 @@ export const TranscriptPage: React.FC<Props> = ({
           </Typography>
         </Box>
 
-        {/* ───────── Chat area ───────── */}
+        {/* ───────── Chat scroll area ───────── */}
         <Box
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
             px: 2,
-            pb: `${barHeightPx + 16}px`,
+            pb: `${barHeightPx + 16}px`,   // keep last bubble clear
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
@@ -176,7 +178,7 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* ───────── Composer bar ───────── */}
+        {/* ───────── Composer bar (10 % up) ───────── */}
         <Box
           sx={{
             position: 'absolute',
@@ -222,6 +224,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
