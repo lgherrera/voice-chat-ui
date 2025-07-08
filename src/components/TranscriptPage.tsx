@@ -16,8 +16,8 @@ interface Props {
   onSend?: (text: string) => void;
 }
 
-const persona = 'Maya';
-const background = '/maya-bg.jpg';
+const persona    = 'Maya';
+const background = '/maya-bg.jpg';   // put image in /public
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -29,6 +29,7 @@ export const TranscriptPage: React.FC<Props> = ({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
 
+  /* auto-scroll to newest bubble */
   useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
     transcripts,
   ]);
@@ -39,10 +40,10 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const barHeightPx = 72;
+  const barHeightPx = 72;            // composer height for bottom padding
 
   return (
-    <Slide direction="left" in>
+    <Slide direction="left" in mountOnEnter unmountOnExit>
       <Box
         sx={{
           position: 'fixed',
@@ -50,14 +51,14 @@ export const TranscriptPage: React.FC<Props> = ({
           width: '100%',
           maxWidth: 430,
           mx: 'auto',
-          height: '100dvh', // important for mobile layout
+          height: '100dvh',          // mobile-safe full height
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           color: 'white',
         }}
       >
-        {/* Background */}
+        {/* ───────── Background ───────── */}
         <Box
           sx={{
             position: 'absolute',
@@ -78,7 +79,7 @@ export const TranscriptPage: React.FC<Props> = ({
           }}
         />
 
-        {/* Header */}
+        {/* ───────── Header ───────── */}
         <Box
           sx={{
             position: 'relative',
@@ -107,6 +108,7 @@ export const TranscriptPage: React.FC<Props> = ({
           </IconButton>
 
           <IconButton
+            aria-label="Phone"
             sx={{
               position: 'absolute',
               right: 16,
@@ -118,7 +120,6 @@ export const TranscriptPage: React.FC<Props> = ({
               width: 36,
               height: 36,
             }}
-            aria-label="Phone"
           >
             <PhoneIcon />
           </IconButton>
@@ -131,13 +132,13 @@ export const TranscriptPage: React.FC<Props> = ({
           </Typography>
         </Box>
 
-        {/* Chat area */}
+        {/* ───────── Chat scroll area ───────── */}
         <Box
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
             px: 2,
-            pb: `${barHeightPx + 16}px`,
+            pb: `${barHeightPx + 16}px`, // keep last bubble clear of composer
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
@@ -171,23 +172,33 @@ export const TranscriptPage: React.FC<Props> = ({
           })}
           <div ref={bottomRef} />
         </Box>
+      </Box>
 
-        {/* Message Composer */}
+      {/* ───────── Message composer (viewport-wide, centered) ───────── */}
+      <Box
+        sx={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 'env(safe-area-inset-bottom)',
+          display: 'flex',
+          justifyContent: 'center',
+          zIndex: 2000,
+          pointerEvents: 'none',        // let inner bar handle clicks
+        }}
+      >
         <Box
           sx={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
             width: '100%',
             maxWidth: 430,
             mx: 'auto',
             display: 'flex',
             gap: 1,
             p: 1.5,
-            backdropFilter: 'blur(10px)',
             bgcolor: 'rgba(0,0,0,0.4)',
-            zIndex: 1,
+            backdropFilter: 'blur(10px)',
+            alignItems: 'center',
+            pointerEvents: 'auto',
           }}
         >
           <TextField
@@ -222,6 +233,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
