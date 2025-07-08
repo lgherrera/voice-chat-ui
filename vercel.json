@@ -1,8 +1,0 @@
-"scripts": {
-  "dev": "vite",
-  "build": "tsc -b && vite build",
-  "preview": "vite preview",
-  "vercel:debug": "echo 'Vercel is rebuilding...'" // ← harmless, triggers Git change
-}
-
-  
