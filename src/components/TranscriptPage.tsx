@@ -9,8 +9,6 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SendIcon from '@mui/icons-material/Send';
-import Picker from '@emoji-mart/react';
-import emojiData from '@emoji-mart/data';
 
 interface Props {
   transcripts: string[];
@@ -30,7 +28,6 @@ export const TranscriptPage: React.FC<Props> = ({
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,12 +37,6 @@ export const TranscriptPage: React.FC<Props> = ({
     if (!draft.trim()) return;
     onSend?.(draft);
     setDraft('');
-    setShowEmojiPicker(false);
-  };
-
-  const addEmoji = (emoji: any) => {
-    setDraft((prev) => prev + emoji.native);
-    setShowEmojiPicker(false);
   };
 
   return (
@@ -185,20 +176,6 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* Emoji picker popup */}
-        {showEmojiPicker && (
-          <Box
-            sx={{
-              position: 'fixed',
-              bottom: 80,
-              right: 16,
-              zIndex: 20,
-            }}
-          >
-            <Picker data={emojiData} onEmojiSelect={addEmoji} theme="dark" />
-          </Box>
-        )}
-
         {/* Message composer */}
         <Box
           sx={{
@@ -233,20 +210,6 @@ export const TranscriptPage: React.FC<Props> = ({
           />
 
           <IconButton
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            aria-label="Emoji"
-            sx={{
-              bgcolor: 'black',
-              color: 'white',
-              '&:hover': { bgcolor: '#333' },
-              width: 48,
-              height: 48,
-            }}
-          >
-            😊
-          </IconButton>
-
-          <IconButton
             onClick={send}
             aria-label="Send"
             sx={{
@@ -264,6 +227,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
