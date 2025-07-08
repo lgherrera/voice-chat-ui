@@ -14,11 +14,11 @@ interface Props {
   transcripts: string[];
   onBack: () => void;
   onSend?: (text: string) => void;
-  onCall?: () => void;
+  onCall?: () => void;                // optional call handler
 }
 
 const persona = 'Maya';
-const background = '/maya-bg.jpg';
+const background = '/maya-bg.jpg';    // place in /public
 
 const isUser = (l: string) => l.startsWith('user:');
 
@@ -41,8 +41,8 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const composerH = 72; // px
-  const zHeader = 1200; // higher than any MUI modal
+  const composerH = 72;   // px
+  const zHeader  = 1200;  // above any scrolling content
 
   return (
     <Slide
@@ -50,7 +50,7 @@ export const TranscriptPage: React.FC<Props> = ({
       in
       mountOnEnter
       unmountOnExit
-      appear={false}         // ← no “dead” window during entry
+      appear={false}     // no dead window during entry
       timeout={0}
     >
       <Box
@@ -113,9 +113,10 @@ export const TranscriptPage: React.FC<Props> = ({
               bgcolor: 'rgba(0,0,0,0.35)',
               backdropFilter: 'blur(4px)',
               color: 'white',
-              width: 36,
-              height: 36,
-              zIndex: zHeader + 1,  // stays on top even if content scrolls
+              width: 42,                       // 36 px → 42 px  (+16 %)
+              height: 42,
+              zIndex: zHeader + 1,
+              '& .MuiSvgIcon-root': { fontSize: 28 }, // 24 px → 28 px (+16 %)
             }}
           >
             <ArrowBackIcon />
@@ -132,9 +133,10 @@ export const TranscriptPage: React.FC<Props> = ({
               bgcolor: 'rgba(0,0,0,0.35)',
               backdropFilter: 'blur(4px)',
               color: 'white',
-              width: 36,
-              height: 36,
+              width: 42,
+              height: 42,
               zIndex: zHeader + 1,
+              '& .MuiSvgIcon-root': { fontSize: 28 },
             }}
           >
             <PhoneIcon />
@@ -153,9 +155,9 @@ export const TranscriptPage: React.FC<Props> = ({
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
-            overscrollBehavior: 'contain',  // ← no rubber-band over header
+            overscrollBehavior: 'contain', // stops rubber-band over header
             px: 2,
-            pb: `${composerH + 16}px`,
+            pb: `${composerH + 16}px`,     // keep last bubble above composer
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
@@ -237,6 +239,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
