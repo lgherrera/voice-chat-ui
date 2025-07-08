@@ -10,25 +10,29 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { ProfileCard } from './ProfileCard';
 
 interface Props {
-  /** Called when user should enter the chat experience */
   onStart: () => void;
 }
 
 export const LandingPage: React.FC<Props> = ({ onStart }) => {
-  /* Card data — drop new objects in this array to add more profiles */
+  /* Card data */
   const cards = [
     {
       imageUrl: '/img1.jpg',
       headline: 'Maya, 24',
       bio: 'Amo los animales, amo mi trabajo, soy tranquila, me gusta leer y ver series en Netflix.',
-      onClick: onStart, // first card launches the chat
+      onClick: onStart,
     },
     {
       imageUrl: '/img2.jpg',
       headline: 'Valentina, 23',
       bio: 'Fanática de los deportes, la vida al aire libre, la buena alimentación, y las amistades duraderas.',
     },
-    // Add more profiles here anytime…
+    /* NEW – Fernanda */
+    {
+      imageUrl: '/img3.jpg',
+      headline: 'Fernanda, 27',
+      bio: 'Amo la noche, la fiesta y los novios.',
+    },
   ];
 
   return (
@@ -44,7 +48,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => {
         flexDirection: 'column',
       }}
     >
-      {/* ───────── Header ───────── */}
+      {/* Header */}
       <Box
         sx={{
           display: 'flex',
@@ -72,7 +76,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => {
 
       <Divider sx={{ borderColor: 'grey.800' }} />
 
-      {/* ───────── Scrollable cards ───────── */}
+      {/* Scrollable cards */}
       <Box
         sx={{
           flexGrow: 1,
@@ -97,6 +101,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => {
     </Box>
   );
 };
+
 
 
 
