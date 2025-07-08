@@ -14,11 +14,11 @@ interface Props {
   transcripts: string[];
   onBack: () => void;
   onSend?: (text: string) => void;
-  onCall?: () => void;              // NEW – optional phone handler
+  onCall?: () => void;
 }
 
 const persona = 'Maya';
-const background = '/maya-bg.jpg';  // place in /public
+const background = '/maya-bg.jpg';
 
 const isUser = (l: string) => l.startsWith('user:');
 
@@ -42,10 +42,17 @@ export const TranscriptPage: React.FC<Props> = ({
   };
 
   const composerH = 72; // px
+  const zHeader = 1200; // higher than any MUI modal
 
   return (
-    <Slide direction="left" in mountOnEnter unmountOnExit>
-      {/* Single wrapper so <Slide> has one child */}
+    <Slide
+      direction="left"
+      in
+      mountOnEnter
+      unmountOnExit
+      appear={false}         // ← no “dead” window during entry
+      timeout={0}
+    >
       <Box
         sx={{
           position: 'fixed',
@@ -63,7 +70,7 @@ export const TranscriptPage: React.FC<Props> = ({
         {/* ─── Background layers ─── */}
         <Box
           sx={{
-            pointerEvents: 'none',           // <<< never steal clicks
+            pointerEvents: 'none',
             position: 'absolute',
             inset: 0,
             backgroundImage: `url(${background})`,
@@ -75,7 +82,7 @@ export const TranscriptPage: React.FC<Props> = ({
         />
         <Box
           sx={{
-            pointerEvents: 'none',           // <<< never steal clicks
+            pointerEvents: 'none',
             position: 'absolute',
             inset: 0,
             bgcolor: 'rgba(0,0,0,0.30)',
@@ -92,12 +99,12 @@ export const TranscriptPage: React.FC<Props> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 10,                     // <<< always on top
+            zIndex: zHeader,
           }}
         >
           <IconButton
-            onClick={onBack}
             aria-label="Back"
+            onClick={onBack}
             sx={{
               position: 'absolute',
               left: 16,
@@ -108,15 +115,15 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
-              zIndex: 11,                  // <<< beats scroll area
+              zIndex: zHeader + 1,  // stays on top even if content scrolls
             }}
           >
             <ArrowBackIcon />
           </IconButton>
 
           <IconButton
-            onClick={onCall}                // <<< now wired up
             aria-label="Call"
+            onClick={onCall}
             sx={{
               position: 'absolute',
               right: 16,
@@ -127,7 +134,7 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
-              zIndex: 11,
+              zIndex: zHeader + 1,
             }}
           >
             <PhoneIcon />
@@ -146,8 +153,9 @@ export const TranscriptPage: React.FC<Props> = ({
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
+            overscrollBehavior: 'contain',  // ← no rubber-band over header
             px: 2,
-            pb: `${composerH + 16}px`, // keep last bubble above composer
+            pb: `${composerH + 16}px`,
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
@@ -181,7 +189,7 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* ─── Message composer (inside column) ─── */}
+        {/* ─── Message composer ─── */}
         <Box
           sx={{
             position: 'absolute',
@@ -194,7 +202,7 @@ export const TranscriptPage: React.FC<Props> = ({
             bgcolor: 'rgba(0,0,0,0.4)',
             backdropFilter: 'blur(10px)',
             alignItems: 'center',
-            zIndex: 9,                    // sits just below header
+            zIndex: zHeader - 1,
           }}
         >
           <TextField
@@ -212,8 +220,8 @@ export const TranscriptPage: React.FC<Props> = ({
             }}
           />
           <IconButton
-            onClick={send}
             aria-label="Send"
+            onClick={send}
             sx={{
               bgcolor: 'black',
               color: 'white',
@@ -229,6 +237,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
