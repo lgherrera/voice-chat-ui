@@ -43,9 +43,10 @@ export const TranscriptPage: React.FC<Props> = ({
 
   return (
     <Slide direction="left" in>
+      {/* ───────── Root container ───────── */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',     // « was "fixed" — avoids pointer-event quirks on mobile
           inset: 0,
           width: '100%',
           maxWidth: 430,
@@ -57,9 +58,10 @@ export const TranscriptPage: React.FC<Props> = ({
           color: 'white',
         }}
       >
-        {/* background image */}
+        {/* ───────── Background layers ───────── */}
         <Box
           sx={{
+            pointerEvents: 'none',                   // so they never eat clicks
             position: 'absolute',
             inset: 0,
             backgroundImage: `url(${background})`,
@@ -71,6 +73,7 @@ export const TranscriptPage: React.FC<Props> = ({
         />
         <Box
           sx={{
+            pointerEvents: 'none',
             position: 'absolute',
             inset: 0,
             bgcolor: 'rgba(0,0,0,0.30)',
@@ -87,13 +90,14 @@ export const TranscriptPage: React.FC<Props> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 5,
+            zIndex: 5,                // sits above everything in the scroll area
           }}
         >
           {/* back arrow */}
           <IconButton
             onClick={onBack}
             sx={{
+              pointerEvents: 'auto',
               position: 'absolute',
               left: 16,
               top: '50%',
@@ -102,6 +106,7 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
+              zIndex: 10,
             }}
           >
             <ArrowBackIcon />
@@ -109,7 +114,10 @@ export const TranscriptPage: React.FC<Props> = ({
 
           {/* phone icon */}
           <IconButton
+            onClick={() => console.log('call')}   // stub handler
+            aria-label="Phone"
             sx={{
+              pointerEvents: 'auto',
               position: 'absolute',
               right: 16,
               top: '50%',
@@ -118,8 +126,8 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
+              zIndex: 10,
             }}
-            aria-label="Phone"
           >
             <PhoneIcon />
           </IconButton>
@@ -220,6 +228,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
