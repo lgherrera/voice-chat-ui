@@ -17,7 +17,7 @@ interface Props {
 }
 
 const persona    = 'Maya';
-const background = '/maya-bg.jpg';      // image in /public
+const background = '/maya-bg.jpg';
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -29,10 +29,9 @@ export const TranscriptPage: React.FC<Props> = ({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
 
-  /* auto-scroll to newest bubble */
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [transcripts]);
+  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
+    transcripts,
+  ]);
 
   const send = () => {
     if (!draft.trim()) return;
@@ -40,12 +39,13 @@ export const TranscriptPage: React.FC<Props> = ({
     setDraft('');
   };
 
-  const barHeightPx = 72;               // composer height for padding
+  const barHeightPx = 72;   // height of composer bar for scroll padding
 
   return (
     <Slide direction="left" in mountOnEnter unmountOnExit>
-      <>  {/* <-- React fragment so Slide has a single child */}
-        {/* ───────── Full-page container ───────── */}
+      {/* ONE real child element so Slide can attach a ref */}
+      <Box sx={{ position: 'relative' }}>
+        {/* ───────── Main fixed column ───────── */}
         <Box
           sx={{
             position: 'fixed',
@@ -53,14 +53,14 @@ export const TranscriptPage: React.FC<Props> = ({
             width: '100%',
             maxWidth: 430,
             mx: 'auto',
-            height: '100dvh',           // dynamic viewport height
+            height: '100dvh',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             color: 'white',
           }}
         >
-          {/* Background image + overlay */}
+          {/* Background layers */}
           <Box
             sx={{
               position: 'absolute',
@@ -140,7 +140,7 @@ export const TranscriptPage: React.FC<Props> = ({
               flexGrow: 1,
               overflowY: 'auto',
               px: 2,
-              pb: `${barHeightPx + 16}px`,   // keep last bubble above composer
+              pb: `${barHeightPx + 16}px`,
               display: 'flex',
               flexDirection: 'column',
               gap: 1.5,
@@ -176,7 +176,7 @@ export const TranscriptPage: React.FC<Props> = ({
           </Box>
         </Box>
 
-        {/* ───────── Composer (viewport-wide, centered) ───────── */}
+        {/* ───────── Composer pinned to viewport bottom ───────── */}
         <Box
           sx={{
             position: 'fixed',
@@ -186,7 +186,6 @@ export const TranscriptPage: React.FC<Props> = ({
             display: 'flex',
             justifyContent: 'center',
             zIndex: 2000,
-            pointerEvents: 'none',       // gutter is non-interactive
           }}
         >
           <Box
@@ -200,7 +199,6 @@ export const TranscriptPage: React.FC<Props> = ({
               bgcolor: 'rgba(0,0,0,0.4)',
               backdropFilter: 'blur(10px)',
               alignItems: 'center',
-              pointerEvents: 'auto',     // bar handles clicks
             }}
           >
             <TextField
@@ -232,10 +230,11 @@ export const TranscriptPage: React.FC<Props> = ({
             </IconButton>
           </Box>
         </Box>
-      </>
+      </Box>
     </Slide>
   );
 };
+
 
 
 
