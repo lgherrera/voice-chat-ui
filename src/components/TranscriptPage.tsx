@@ -9,6 +9,8 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SendIcon from '@mui/icons-material/Send';
+import Picker from '@emoji-mart/react';
+import emojiData from '@emoji-mart/data';
 
 interface Props {
   transcripts: string[];
@@ -16,7 +18,7 @@ interface Props {
   onSend?: (text: string) => void;
 }
 
-const persona    = 'Maya';
+const persona = 'Maya';
 const background = '/maya-bg.jpg';
 
 const isUser = (line: string) => line.startsWith('user:');
@@ -28,40 +30,44 @@ export const TranscriptPage: React.FC<Props> = ({
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
-    transcripts,
-  ]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcripts]);
 
   const send = () => {
     if (!draft.trim()) return;
     onSend?.(draft);
     setDraft('');
+    setShowEmojiPicker(false);
   };
 
-  const barHeightPx = 72;
+  const addEmoji = (emoji: any) => {
+    setDraft((prev) => prev + emoji.native);
+    setShowEmojiPicker(false);
+  };
 
   return (
     <Slide direction="left" in>
-      {/* ───────── Root container ───────── */}
       <Box
         sx={{
-          position: 'absolute',     // « was "fixed" — avoids pointer-event quirks on mobile
+          position: 'absolute',
           inset: 0,
           width: '100%',
           maxWidth: 430,
           mx: 'auto',
-          height: '100vh',
+          height: '100dvh',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           color: 'white',
         }}
       >
-        {/* ───────── Background layers ───────── */}
+        {/* Background layers */}
         <Box
           sx={{
-            pointerEvents: 'none',                   // so they never eat clicks
+            pointerEvents: 'none',
             position: 'absolute',
             inset: 0,
             backgroundImage: `url(${background})`,
@@ -81,7 +87,7 @@ export const TranscriptPage: React.FC<Props> = ({
           }}
         />
 
-        {/* ───────── Header ───────── */}
+        {/* Header */}
         <Box
           sx={{
             position: 'relative',
@@ -90,10 +96,9 @@ export const TranscriptPage: React.FC<Props> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 5,                // sits above everything in the scroll area
+            zIndex: 5,
           }}
         >
-          {/* back arrow */}
           <IconButton
             onClick={onBack}
             sx={{
@@ -112,9 +117,8 @@ export const TranscriptPage: React.FC<Props> = ({
             <ArrowBackIcon />
           </IconButton>
 
-          {/* phone icon */}
           <IconButton
-            onClick={() => console.log('call')}   // stub handler
+            onClick={() => console.log('call')}
             aria-label="Phone"
             sx={{
               pointerEvents: 'auto',
@@ -132,7 +136,6 @@ export const TranscriptPage: React.FC<Props> = ({
             <PhoneIcon />
           </IconButton>
 
-          {/* centered name + status */}
           <Typography variant="h5" fontWeight={600}>
             {persona}
           </Typography>
@@ -141,13 +144,13 @@ export const TranscriptPage: React.FC<Props> = ({
           </Typography>
         </Box>
 
-        {/* ───────── Chat area ───────── */}
+        {/* Chat area */}
         <Box
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
             px: 2,
-            pb: `${barHeightPx + 16}px`,
+            pb: '96px',
             display: 'flex',
             flexDirection: 'column',
             gap: 1.5,
@@ -182,18 +185,36 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* ───────── Composer bar ───────── */}
+        {/* Emoji picker popup */}
+        {showEmojiPicker && (
+          <Box
+            sx={{
+              position: 'fixed',
+              bottom: 80,
+              right: 16,
+              zIndex: 20,
+            }}
+          >
+            <Picker data={emojiData} onEmojiSelect={addEmoji} theme="dark" />
+          </Box>
+        )}
+
+        {/* Message composer */}
         <Box
           sx={{
-            position: 'absolute',
+            position: 'fixed',
             left: 0,
             right: 0,
-            bottom: '10%',
+            bottom: 'env(safe-area-inset-bottom)',
             display: 'flex',
             gap: 1,
             p: 1.5,
             backdropFilter: 'blur(10px)',
             bgcolor: 'rgba(0,0,0,0.4)',
+            zIndex: 10,
+            maxWidth: 430,
+            mx: 'auto',
+            alignItems: 'center',
           }}
         >
           <TextField
@@ -210,6 +231,21 @@ export const TranscriptPage: React.FC<Props> = ({
               borderRadius: 2,
             }}
           />
+
+          <IconButton
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            aria-label="Emoji"
+            sx={{
+              bgcolor: 'black',
+              color: 'white',
+              '&:hover': { bgcolor: '#333' },
+              width: 48,
+              height: 48,
+            }}
+          >
+            😊
+          </IconButton>
+
           <IconButton
             onClick={send}
             aria-label="Send"
@@ -228,6 +264,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
