@@ -180,53 +180,61 @@ export const TranscriptPage: React.FC<Props> = ({
         <Box
           sx={{
             position: 'fixed',
-            left: 0,
-            right: 0,
             bottom: 'env(safe-area-inset-bottom)',
+            width: '100%',
             display: 'flex',
-            gap: 1,
-            p: 1.5,
-            backdropFilter: 'blur(10px)',
-            bgcolor: 'rgba(0,0,0,0.4)',
+            justifyContent: 'center',
             zIndex: 10,
-            maxWidth: 430,
-            mx: 'auto',
-            alignItems: 'center',
           }}
         >
-          <TextField
-            fullWidth
-            variant="filled"
-            size="small"
-            placeholder="Message"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && send()}
+          <Box
             sx={{
-              input: { color: 'white' },
-              bgcolor: 'rgba(255,255,255,0.15)',
-              borderRadius: 2,
-            }}
-          />
-
-          <IconButton
-            onClick={send}
-            aria-label="Send"
-            sx={{
-              bgcolor: 'black',
-              color: 'white',
-              '&:hover': { bgcolor: '#333' },
-              width: 48,
-              height: 48,
+              width: '100%',
+              maxWidth: 430,
+              mx: 'auto',
+              display: 'flex',
+              gap: 1,
+              p: 1.5,
+              backdropFilter: 'blur(10px)',
+              bgcolor: 'rgba(0,0,0,0.4)',
+              alignItems: 'center',
             }}
           >
-            <SendIcon />
-          </IconButton>
+            <TextField
+              fullWidth
+              variant="filled"
+              size="small"
+              placeholder="Message"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && send()}
+              sx={{
+                input: { color: 'white' },
+                bgcolor: 'rgba(255,255,255,0.15)',
+                borderRadius: 2,
+              }}
+            />
+
+            <IconButton
+              onClick={send}
+              aria-label="Send"
+              sx={{
+                bgcolor: 'black',
+                color: 'white',
+                '&:hover': { bgcolor: '#333' },
+                width: 48,
+                height: 48,
+              }}
+            >
+              <SendIcon />
+            </IconButton>
+          </Box>
         </Box>
       </Box>
     </Slide>
   );
 };
+
 
 
 
