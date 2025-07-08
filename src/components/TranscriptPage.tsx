@@ -43,7 +43,7 @@ export const TranscriptPage: React.FC<Props> = ({
     <Slide direction="left" in>
       <Box
         sx={{
-          position: 'absolute',
+          position: 'relative',
           inset: 0,
           width: '100%',
           maxWidth: 430,
@@ -93,7 +93,6 @@ export const TranscriptPage: React.FC<Props> = ({
           <IconButton
             onClick={onBack}
             sx={{
-              pointerEvents: 'auto',
               position: 'absolute',
               left: 16,
               top: '50%',
@@ -102,17 +101,14 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
-              zIndex: 10,
             }}
           >
             <ArrowBackIcon />
           </IconButton>
 
           <IconButton
-            onClick={() => console.log('call')}
             aria-label="Phone"
             sx={{
-              pointerEvents: 'auto',
               position: 'absolute',
               right: 16,
               top: '50%',
@@ -121,7 +117,6 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
-              zIndex: 10,
             }}
           >
             <PhoneIcon />
@@ -176,28 +171,27 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* Message composer */}
+        {/* Message composer (now absolutely positioned) */}
         <Box
           sx={{
-            position: 'fixed',
+            position: 'absolute',
+            left: 0,
+            right: 0,
             bottom: 'env(safe-area-inset-bottom)',
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
+            px: 1.5,
             zIndex: 10,
           }}
         >
           <Box
             sx={{
-              width: '100%',
-              maxWidth: 430,
-              mx: 'auto',
               display: 'flex',
               gap: 1,
-              p: 1.5,
               backdropFilter: 'blur(10px)',
               bgcolor: 'rgba(0,0,0,0.4)',
               alignItems: 'center',
+              borderRadius: 2,
+              px: 1.5,
+              py: 1.25,
             }}
           >
             <TextField
@@ -234,6 +228,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
