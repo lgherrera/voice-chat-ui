@@ -14,10 +14,11 @@ interface Props {
   transcripts: string[];
   onBack: () => void;
   onSend?: (text: string) => void;
+  onCall?: () => void;              // NEW – optional phone handler
 }
 
 const persona = 'Maya';
-const background = '/maya-bg.jpg'; // place in /public
+const background = '/maya-bg.jpg';  // place in /public
 
 const isUser = (l: string) => l.startsWith('user:');
 
@@ -25,14 +26,14 @@ export const TranscriptPage: React.FC<Props> = ({
   transcripts,
   onBack,
   onSend,
+  onCall,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
 
-  useEffect(
-    () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }),
-    [transcripts],
-  );
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcripts]);
 
   const send = () => {
     if (!draft.trim()) return;
@@ -62,6 +63,7 @@ export const TranscriptPage: React.FC<Props> = ({
         {/* ─── Background layers ─── */}
         <Box
           sx={{
+            pointerEvents: 'none',           // <<< never steal clicks
             position: 'absolute',
             inset: 0,
             backgroundImage: `url(${background})`,
@@ -73,6 +75,7 @@ export const TranscriptPage: React.FC<Props> = ({
         />
         <Box
           sx={{
+            pointerEvents: 'none',           // <<< never steal clicks
             position: 'absolute',
             inset: 0,
             bgcolor: 'rgba(0,0,0,0.30)',
@@ -89,10 +92,12 @@ export const TranscriptPage: React.FC<Props> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            zIndex: 10,                     // <<< always on top
           }}
         >
           <IconButton
             onClick={onBack}
+            aria-label="Back"
             sx={{
               position: 'absolute',
               left: 16,
@@ -103,13 +108,15 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
+              zIndex: 11,                  // <<< beats scroll area
             }}
           >
             <ArrowBackIcon />
           </IconButton>
 
           <IconButton
-            aria-label="Phone"
+            onClick={onCall}                // <<< now wired up
+            aria-label="Call"
             sx={{
               position: 'absolute',
               right: 16,
@@ -120,6 +127,7 @@ export const TranscriptPage: React.FC<Props> = ({
               color: 'white',
               width: 36,
               height: 36,
+              zIndex: 11,
             }}
           >
             <PhoneIcon />
@@ -186,6 +194,7 @@ export const TranscriptPage: React.FC<Props> = ({
             bgcolor: 'rgba(0,0,0,0.4)',
             backdropFilter: 'blur(10px)',
             alignItems: 'center',
+            zIndex: 9,                    // sits just below header
           }}
         >
           <TextField
@@ -220,6 +229,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
