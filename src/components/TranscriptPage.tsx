@@ -17,7 +17,7 @@ interface Props {
 }
 
 const persona = 'Maya';
-const background = '/maya-bg.jpg'; // image in /public
+const background = '/maya-bg.jpg';
 
 const isUser = (line: string) => line.startsWith('user:');
 
@@ -29,9 +29,9 @@ export const TranscriptPage: React.FC<Props> = ({
   const bottomRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState('');
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [transcripts]);
+  useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [
+    transcripts,
+  ]);
 
   const send = () => {
     if (!draft.trim()) return;
@@ -50,14 +50,14 @@ export const TranscriptPage: React.FC<Props> = ({
           width: '100%',
           maxWidth: 430,
           mx: 'auto',
-          height: '100dvh', // ← critical for mobile view
+          height: '100dvh', // important for mobile layout
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           color: 'white',
         }}
       >
-        {/* background image */}
+        {/* Background */}
         <Box
           sx={{
             position: 'absolute',
@@ -131,7 +131,7 @@ export const TranscriptPage: React.FC<Props> = ({
           </Typography>
         </Box>
 
-        {/* Chat scroll area */}
+        {/* Chat area */}
         <Box
           sx={{
             flexGrow: 1,
@@ -172,18 +172,22 @@ export const TranscriptPage: React.FC<Props> = ({
           <div ref={bottomRef} />
         </Box>
 
-        {/* Composer */}
+        {/* Message Composer */}
         <Box
           sx={{
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: '10%',
+            bottom: 0,
+            width: '100%',
+            maxWidth: 430,
+            mx: 'auto',
             display: 'flex',
             gap: 1,
             p: 1.5,
             backdropFilter: 'blur(10px)',
             bgcolor: 'rgba(0,0,0,0.4)',
+            zIndex: 1,
           }}
         >
           <TextField
@@ -218,6 +222,7 @@ export const TranscriptPage: React.FC<Props> = ({
     </Slide>
   );
 };
+
 
 
 
