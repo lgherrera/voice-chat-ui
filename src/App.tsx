@@ -5,13 +5,11 @@ import {
   IconButton,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import KeyboardIcon from '@mui/icons-material/Keyboard';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
 
 import { useVapi } from './hooks/useVapi';
 import { AvatarPlaceholder } from './components/AvatarPlaceholder';
-import { TextChat } from './components/TextChat';
 import { TranscriptPage } from './components/chat';
 
 /* ───────────────────  ENV  ─────────────────── */
@@ -21,7 +19,7 @@ const assistantId =
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 interface Props {
-  onBack: () => void;   // supplied by Root (main.tsx)
+  onBack: () => void;
 }
 
 export default function App({ onBack }: Props) {
@@ -32,29 +30,19 @@ export default function App({ onBack }: Props) {
     transcripts,
   } = useVapi(apiKey, assistantId);
 
-  const [chatOpen, setChatOpen] = useState(false);
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* ─────────────────────────────
-     Mobile-safe call starter
-  ───────────────────────────── */
+  /* Mobile-safe call starter (temp AudioContext trick) */
   const handleStart = () => {
-    // 1) iOS / mobile browsers sometimes begin with AudioContext "suspended"
     try {
       if (typeof window !== 'undefined' && 'AudioContext' in window) {
-        const TmpCtx =
+        const Ctx =
           (window as any).AudioContext || (window as any).webkitAudioContext;
-        const ctx = new TmpCtx();
-        if (ctx.state === 'suspended') {
-          ctx.resume().catch(() => {/* ignore */});
-        }
+        const ctx = new Ctx();
+        if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch (e) {
-      console.warn('AudioContext resume skipped:', e);
-    }
-
-    // 2) keep Vapi start inside the tap's user-gesture frame
+    } catch {/* ignore */}
     requestAnimationFrame(() => start());
   };
 
@@ -63,7 +51,7 @@ export default function App({ onBack }: Props) {
     return (
       <TranscriptPage
         transcripts={transcripts}
-        personaId="maya"          // switch persona here if needed
+        personaId="maya"
         onBack={() => setPage('home')}
         onSend={sendText}
         onCall={handleStart}
@@ -115,21 +103,6 @@ export default function App({ onBack }: Props) {
         }}
       >
         <AvatarPlaceholder />
-
-        {/* keyboard drawer trigger */}
-        <IconButton
-          sx={{
-            mt: 6,
-            flexDirection: 'column',
-            color: 'grey.500',
-            '&:hover': { color: 'common.white' },
-          }}
-          onClick={() => setChatOpen(true)}
-          aria-label="Use keyboard input"
-        >
-          <KeyboardIcon sx={{ fontSize: { xs: 32, md: 40 } }} />
-          <Typography variant="body1">Use&nbsp;Keyboard</Typography>
-        </IconButton>
       </Box>
 
       {/* Footer navigation */}
@@ -195,16 +168,10 @@ export default function App({ onBack }: Props) {
           </IconButton>
         </Box>
       </Box>
-
-      {/* Keyboard drawer */}
-      <TextChat
-        open={chatOpen}
-        onClose={() => setChatOpen(false)}
-        onSend={sendText}
-      />
     </Box>
   );
 }
+
 
 
 
