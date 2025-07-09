@@ -30,7 +30,6 @@ export default function App({ onBack }: Props) {
     stop,
     sendText,
     transcripts,
-    audioContext,        // <- make sure useVapi returns this
   } = useVapi(apiKey, assistantId);
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -40,11 +39,22 @@ export default function App({ onBack }: Props) {
      Mobile-safe call starter
   ───────────────────────────── */
   const handleStart = () => {
-    // 👂 iOS Safari starts with 'suspended' AudioContext
-    if (audioContext?.state === 'suspended') {
-      audioContext.resume().catch(console.error);
+    // 1) iOS / mobile browsers sometimes begin with AudioContext "suspended"
+    try {
+      if (typeof window !== 'undefined' && 'AudioContext' in window) {
+        const TmpCtx =
+          (window as any).AudioContext || (window as any).webkitAudioContext;
+        const ctx = new TmpCtx();
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {/* ignore */});
+        }
+        ctx.close();
+      }
+    } catch (e) {
+      console.warn('AudioContext resume skipped:', e);
     }
-    // Ensure we stay inside the same user-gesture frame
+
+    // 2) keep Vapi start inside the tap's user-gesture frame
     requestAnimationFrame(() => start());
   };
 
@@ -53,10 +63,10 @@ export default function App({ onBack }: Props) {
     return (
       <TranscriptPage
         transcripts={transcripts}
-        personaId="maya"
+        personaId="maya"          // switch persona here if needed
         onBack={() => setPage('home')}
         onSend={sendText}
-        onCall={handleStart}      // phone icon in header
+        onCall={handleStart}
       />
     );
   }
@@ -195,6 +205,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
