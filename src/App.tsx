@@ -12,7 +12,14 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import { useVapi } from './hooks/useVapi';
 import { AvatarPlaceholder } from './components/AvatarPlaceholder';
 import { TextChat } from './components/TextChat';
-import { TranscriptPage } from './components/TranscriptPage';
+
+/* NOTE ──────────────────────────────────────────
+   TranscriptPage (and all its slice components)
+   now live in src/components/chat/ and are re-exported
+   via a barrel file, so you can import from that folder
+   rather than a single file path.
+───────────────────────────────────────────────── */
+import { TranscriptPage } from './components/chat';
 
 /* ───────────────────  ENV  ─────────────────── */
 const apiKey      = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
@@ -28,25 +35,27 @@ export default function App({ onBack }: Props) {
   const {
     start,
     stop,
-    sendText,         // ← new helper for typed chat
+    sendText,           // helper for typed chat
     transcripts,
   } = useVapi(apiKey, assistantId);
 
-  const [chatOpen, setChatOpen] = useState(false);
-  const [page, setPage] = useState<'home' | 'history'>('home');
+  const [chatOpen, setChatOpen]   = useState(false);
+  const [page, setPage]           = useState<'home' | 'history'>('home');
 
-  /* ────────── Transcript History page ────────── */
+  /* ───────── Transcript History page ───────── */
   if (page === 'history') {
     return (
       <TranscriptPage
         transcripts={transcripts}
+        personaId="maya"           // 'maya' | 'luna' | 'felix' …
         onBack={() => setPage('home')}
-        onSend={sendText}                 // pass typing handler
+        onSend={sendText}
+        onCall={start}             // optional: call button starts Vapi
       />
     );
   }
 
-  /* ────────────── Main voice page ────────────── */
+  /* ───────────── Main voice page ───────────── */
   return (
     <Box
       sx={{
@@ -175,11 +184,12 @@ export default function App({ onBack }: Props) {
       <TextChat
         open={chatOpen}
         onClose={() => setChatOpen(false)}
-        onSend={sendText}       // ← wired to Vapi
+        onSend={sendText}
       />
     </Box>
   );
 }
+
 
 
 
