@@ -12,13 +12,6 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import { useVapi } from './hooks/useVapi';
 import { AvatarPlaceholder } from './components/AvatarPlaceholder';
 import { TextChat } from './components/TextChat';
-
-/* NOTE ──────────────────────────────────────────
-   TranscriptPage (and all its slice components)
-   now live in src/components/chat/ and are re-exported
-   via a barrel file, so you can import from that folder
-   rather than a single file path.
-───────────────────────────────────────────────── */
 import { TranscriptPage } from './components/chat';
 
 /* ───────────────────  ENV  ─────────────────── */
@@ -35,22 +28,35 @@ export default function App({ onBack }: Props) {
   const {
     start,
     stop,
-    sendText,           // helper for typed chat
+    sendText,
     transcripts,
+    audioContext,        // <- make sure useVapi returns this
   } = useVapi(apiKey, assistantId);
 
-  const [chatOpen, setChatOpen]   = useState(false);
-  const [page, setPage]           = useState<'home' | 'history'>('home');
+  const [chatOpen, setChatOpen] = useState(false);
+  const [page, setPage] = useState<'home' | 'history'>('home');
+
+  /* ─────────────────────────────
+     Mobile-safe call starter
+  ───────────────────────────── */
+  const handleStart = () => {
+    // 👂 iOS Safari starts with 'suspended' AudioContext
+    if (audioContext?.state === 'suspended') {
+      audioContext.resume().catch(console.error);
+    }
+    // Ensure we stay inside the same user-gesture frame
+    requestAnimationFrame(() => start());
+  };
 
   /* ───────── Transcript History page ───────── */
   if (page === 'history') {
     return (
       <TranscriptPage
         transcripts={transcripts}
-        personaId="maya"           // 'maya' | 'luna' | 'felix' …
+        personaId="maya"
         onBack={() => setPage('home')}
         onSend={sendText}
-        onCall={start}             // optional: call button starts Vapi
+        onCall={handleStart}      // phone icon in header
       />
     );
   }
@@ -135,7 +141,7 @@ export default function App({ onBack }: Props) {
           </IconButton>
 
           {/* start call */}
-          <IconButton aria-label="Start call" onClick={start}>
+          <IconButton aria-label="Start call" onClick={handleStart}>
             <Box
               sx={{
                 width: { xs: 48, md: 64 },
@@ -189,6 +195,10 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
+
+
+
 
 
 
