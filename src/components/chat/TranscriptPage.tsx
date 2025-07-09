@@ -1,5 +1,6 @@
+// src/components/chat/TranscriptPage.tsx
 import React from 'react';
-import { PERSONAS } from '@/constants/personas';
+import { PERSONAS } from '../../constants/personas';          // ← relative path
 import { ChatPageShell } from './ChatPageShell';
 import { ChatBackground } from './ChatBackground';
 import { ChatHeader } from './ChatHeader';
@@ -26,12 +27,18 @@ export const TranscriptPage: React.FC<TranscriptPageProps> = ({
   return (
     <ChatPageShell>
       <ChatBackground imageUrl={background} />
-      <ChatHeader persona={name} status="online" onBack={onBack} onCall={onCall} />
+      <ChatHeader
+        persona={name}
+        status="online"
+        onBack={onBack}
+        onCall={onCall}
+      />
       <MessageList messages={transcripts} />
       <MessageComposer onSend={(text) => onSend?.(text)} />
     </ChatPageShell>
   );
 };
+
 
 
 
