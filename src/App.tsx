@@ -3,9 +3,8 @@ import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useVapi } from './hooks/useVapi';
-import { AvatarPlaceholder } from './components/AvatarPlaceholder';
-import { ChatBackground } from './components/chat';    // from barrel
-import { ChatFooter } from './components/ChatFooter';   // direct import
+import { ChatBackground } from './components/chat';
+import { ChatFooter } from './components/ChatFooter';
 import { TranscriptPage } from './components/chat';
 
 /* ───────────────────  ENV  ─────────────────── */
@@ -21,27 +20,26 @@ interface Props {
 export default function App({ onBack }: Props) {
   const { start, stop, sendText, transcripts, status } = useVapi(
     apiKey,
-    assistantId
+    assistantId,
   );
 
   const [page, setPage] = useState<'home' | 'history'>('home');
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* ───── Banner logic ───── */
+  /* ───────── Banner logic ───────── */
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-
+    let t: ReturnType<typeof setTimeout> | undefined;
     if (status === 'calling') {
-      timer = setTimeout(() => setConnected(true), 2000);
+      t = setTimeout(() => setConnected(true), 2000);
     } else if (status === 'ended') {
       setDialing(false);
       setConnected(false);
     }
-    return () => clearTimeout(timer);
+    return () => clearTimeout(t);
   }, [status]);
 
-  /* ───── Start call ───── */
+  /* ───────── Start call ───────── */
   const handleStart = () => {
     setDialing(true);
     try {
@@ -52,11 +50,11 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {/* ignore */ }
+    } catch {}
     requestAnimationFrame(() => start());
   };
 
-  /* ───── History page ───── */
+  /* ───────── History page ───────── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -69,7 +67,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ───── Main voice page ───── */
+  /* ───────── Main voice page ───────── */
   return (
     <Box
       sx={{
@@ -85,10 +83,8 @@ export default function App({ onBack }: Props) {
         color: 'common.white',
       }}
     >
-      {/* Shared background */}
       <ChatBackground imageUrl="/maya-bg.jpg" />
 
-      {/* Foreground Flex Column */}
       <Box
         sx={{
           flexGrow: 1,
@@ -101,7 +97,6 @@ export default function App({ onBack }: Props) {
           zIndex: 10,
         }}
       >
-        {/* Back arrow */}
         <IconButton
           onClick={onBack}
           sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
@@ -110,12 +105,11 @@ export default function App({ onBack }: Props) {
           <ArrowBackIcon />
         </IconButton>
 
-        {/* Header */}
         <Typography variant="h4" sx={{ mb: 2, fontWeight: 300 }}>
           Maya,&nbsp;24
         </Typography>
 
-        {/* Avatar + banner */}
+        {/* Center banner (no avatar) */}
         <Box
           sx={{
             flexGrow: 1,
@@ -125,12 +119,9 @@ export default function App({ onBack }: Props) {
             justifyContent: 'center',
           }}
         >
-          <AvatarPlaceholder />
-
           {dialing && (
             <Typography
               sx={{
-                mt: 2,
                 fontSize: '20px',
                 color: 'grey.300',
                 animation: connected
@@ -144,7 +135,6 @@ export default function App({ onBack }: Props) {
           )}
         </Box>
 
-        {/* Footer buttons */}
         <ChatFooter
           onHistory={() => setPage('history')}
           onStart={handleStart}
@@ -154,6 +144,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
