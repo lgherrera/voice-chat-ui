@@ -4,7 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useVapi } from './hooks/useVapi';
 import { AvatarPlaceholder } from './components/AvatarPlaceholder';
-import { ChatFooter } from './components/ChatFooter';
+import { ChatFooter, ChatBackground } from './components/chat'; // ← background added
 import { TranscriptPage } from './components/chat';
 
 /* ───────────────────  ENV  ─────────────────── */
@@ -27,31 +27,24 @@ export default function App({ onBack }: Props) {
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* ─────────────────────────────
-     Manage banner + 2-second flip
-  ───────────────────────────── */
+  /* ───────── Banner logic ───────── */
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
+    let t: ReturnType<typeof setTimeout> | undefined;
 
     if (status === 'calling') {
-      // already dialing; now start the flip timer
-      timer = setTimeout(() => setConnected(true), 2000);
+      t = setTimeout(() => setConnected(true), 2000);
     } else if (status === 'ended') {
-      // call finished -> hide banner
       setDialing(false);
       setConnected(false);
     }
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(t);
   }, [status]);
 
-  /* ─────────────────────────────
-     Mobile-safe call starter
-  ───────────────────────────── */
+  /* ───────── Start call ───────── */
   const handleStart = () => {
-    setDialing(true); // show “Calling…” immediately
+    setDialing(true);
 
-    // iOS Safari: resume suspended AudioContext
     try {
       if ('AudioContext' in window) {
         const Ctx =
@@ -82,70 +75,89 @@ export default function App({ onBack }: Props) {
   return (
     <Box
       sx={{
-        bgcolor: 'black',
-        color: 'common.white',
-        minHeight: '100vh',
+        position: 'fixed',
+        inset: 0,
         width: '100%',
         maxWidth: 430,
         mx: 'auto',
-        boxShadow: { sm: 3 },
+        height: '100dvh',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        p: 2,
+        color: 'common.white',
       }}
     >
-      {/* Back arrow */}
-      <IconButton
-        onClick={onBack}
-        sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
-        aria-label="Back to landing"
-      >
-        <ArrowBackIcon />
-      </IconButton>
+      {/* Shared blurred image background */}
+      <ChatBackground imageUrl="/maya-bg.jpg" />
 
-      {/* Header */}
-      <Typography variant="h4" sx={{ mb: 2, fontWeight: 300 }}>
-        Let’s&nbsp;Have&nbsp;a&nbsp;Chat
-      </Typography>
-
-      {/* Avatar + call status */}
+      {/* ─── Foreground content (relative) ─── */}
       <Box
         sx={{
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          position: 'relative',
+          zIndex: 10,
         }}
       >
-        <AvatarPlaceholder />
+        {/* Back arrow */}
+        <IconButton
+          onClick={onBack}
+          sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
+          aria-label="Back to landing"
+        >
+          <ArrowBackIcon />
+        </IconButton>
 
-        {dialing && (
-          <Typography
-            sx={{
-              mt: 2,
-              fontSize: '20px',
-              color: 'grey.400',
-              animation: connected ? 'none' : 'blink 1s step-start infinite',
-              '@keyframes blink': { '50%': { opacity: 0 } },
-            }}
-          >
-            {connected ? 'Connected' : 'Calling…'}
-          </Typography>
-        )}
+        {/* Header */}
+        <Typography variant="h4" sx={{ mb: 2, fontWeight: 300 }}>
+          Maya,&nbsp;24
+        </Typography>
+
+        {/* Avatar + banner */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <AvatarPlaceholder />
+
+          {dialing && (
+            <Typography
+              sx={{
+                mt: 2,
+                fontSize: '20px',
+                color: 'grey.300',
+                animation: connected
+                  ? 'none'
+                  : 'blink 1s step-start infinite',
+                '@keyframes blink': { '50%': { opacity: 0 } },
+              }}
+            >
+              {connected ? 'Connected' : 'Calling…'}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Footer */}
+        <ChatFooter
+          onHistory={() => setPage('history')}
+          onStart={handleStart}
+          onStop={stop}
+        />
       </Box>
-
-      {/* Footer */}
-      <ChatFooter
-        onHistory={() => setPage('history')}
-        onStart={handleStart}
-        onStop={stop}
-      />
     </Box>
   );
 }
+
+
 
 
 
