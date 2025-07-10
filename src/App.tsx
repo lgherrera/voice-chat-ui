@@ -24,28 +24,34 @@ export default function App({ onBack }: Props) {
   );
 
   const [page, setPage] = useState<'home' | 'history'>('home');
-  const [dialing, setDialing] = useState(false);  // ← new
+  const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* Flip to “Connected” 2 s after dialing */
+  /* ─────────────────────────────
+     Manage banner + 2-second flip
+  ───────────────────────────── */
   useEffect(() => {
-    let t: ReturnType<typeof setTimeout> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
-    if (dialing) {                              // timer starts sooner
-      t = setTimeout(() => setConnected(true), 2000);
-    }
-
-    if (status !== 'calling') {                 // reset on idle / ended
+    if (status === 'calling') {
+      // already dialing; now start the flip timer
+      timer = setTimeout(() => setConnected(true), 2000);
+    } else if (status === 'ended') {
+      // call finished -> hide banner
       setDialing(false);
       setConnected(false);
     }
 
-    return () => clearTimeout(t);
-  }, [dialing, status]);
+    return () => clearTimeout(timer);
+  }, [status]);
 
-  /* Mobile-safe call starter */
+  /* ─────────────────────────────
+     Mobile-safe call starter
+  ───────────────────────────── */
   const handleStart = () => {
-    setDialing(true);                           // show banner right away
+    setDialing(true); // show “Calling…” immediately
+
+    // iOS Safari: resume suspended AudioContext
     try {
       if ('AudioContext' in window) {
         const Ctx =
@@ -55,10 +61,11 @@ export default function App({ onBack }: Props) {
         ctx.close();
       }
     } catch {/* ignore */}
+
     requestAnimationFrame(() => start());
   };
 
-  /* ─── History page ─── */
+  /* ───────── History page ───────── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -71,7 +78,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ─── Main voice page ─── */
+  /* ───────── Main voice page ───────── */
   return (
     <Box
       sx={{
@@ -115,16 +122,14 @@ export default function App({ onBack }: Props) {
       >
         <AvatarPlaceholder />
 
-        {(dialing || status === 'calling') && (
+        {dialing && (
           <Typography
             sx={{
               mt: 2,
               fontSize: '20px',
               color: 'grey.400',
               animation: connected ? 'none' : 'blink 1s step-start infinite',
-              '@keyframes blink': {
-                '50%': { opacity: 0 },
-              },
+              '@keyframes blink': { '50%': { opacity: 0 } },
             }}
           >
             {connected ? 'Connected' : 'Calling…'}
@@ -141,6 +146,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
