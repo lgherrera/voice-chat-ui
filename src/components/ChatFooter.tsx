@@ -38,28 +38,26 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
             width: { xs: 48, md: 64 },
             height: { xs: 48, md: 64 },
             borderRadius: '50%',
-            bgcolor: 'success.main',             // ← solid green circle
+            bgcolor: 'success.main',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
           <PhoneIcon
-            sx={{ fontSize: { xs: 28, md: 36 }, color: 'common.white' }} // ← white icon
+            sx={{ fontSize: { xs: 28, md: 36 }, color: 'common.white' }}
           />
         </Box>
       </IconButton>
 
-      {/* end call */}
+      {/* end call – white icon on red circle */}
       <IconButton aria-label="End call" onClick={onStop}>
         <Box
           sx={{
             width: { xs: 48, md: 64 },
             height: { xs: 48, md: 64 },
             borderRadius: '50%',
-            border: 3,
-            borderColor: 'error.main',
-            color: 'error.main',
+            bgcolor: 'error.main',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -69,6 +67,7 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
             sx={{
               transform: 'rotate(135deg)',
               fontSize: { xs: 28, md: 36 },
+              color: 'common.white',
             }}
           />
         </Box>
@@ -76,4 +75,5 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
     </Box>
   </Box>
 );
+
 
