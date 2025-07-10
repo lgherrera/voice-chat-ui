@@ -4,7 +4,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useVapi } from './hooks/useVapi';
 import { AvatarPlaceholder } from './components/AvatarPlaceholder';
-import { ChatFooter, ChatBackground } from './components/chat'; // ← background added
+import { ChatBackground } from './components/chat';    // from barrel
+import { ChatFooter } from './components/ChatFooter';   // direct import
 import { TranscriptPage } from './components/chat';
 
 /* ───────────────────  ENV  ─────────────────── */
@@ -20,31 +21,29 @@ interface Props {
 export default function App({ onBack }: Props) {
   const { start, stop, sendText, transcripts, status } = useVapi(
     apiKey,
-    assistantId,
+    assistantId
   );
 
   const [page, setPage] = useState<'home' | 'history'>('home');
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* ───────── Banner logic ───────── */
+  /* ───── Banner logic ───── */
   useEffect(() => {
-    let t: ReturnType<typeof setTimeout> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
     if (status === 'calling') {
-      t = setTimeout(() => setConnected(true), 2000);
+      timer = setTimeout(() => setConnected(true), 2000);
     } else if (status === 'ended') {
       setDialing(false);
       setConnected(false);
     }
-
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [status]);
 
-  /* ───────── Start call ───────── */
+  /* ───── Start call ───── */
   const handleStart = () => {
     setDialing(true);
-
     try {
       if ('AudioContext' in window) {
         const Ctx =
@@ -53,12 +52,11 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {/* ignore */}
-
+    } catch {/* ignore */ }
     requestAnimationFrame(() => start());
   };
 
-  /* ───────── History page ───────── */
+  /* ───── History page ───── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -71,7 +69,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ───────── Main voice page ───────── */
+  /* ───── Main voice page ───── */
   return (
     <Box
       sx={{
@@ -87,10 +85,10 @@ export default function App({ onBack }: Props) {
         color: 'common.white',
       }}
     >
-      {/* Shared blurred image background */}
+      {/* Shared background */}
       <ChatBackground imageUrl="/maya-bg.jpg" />
 
-      {/* ─── Foreground content (relative) ─── */}
+      {/* Foreground Flex Column */}
       <Box
         sx={{
           flexGrow: 1,
@@ -146,7 +144,7 @@ export default function App({ onBack }: Props) {
           )}
         </Box>
 
-        {/* Footer */}
+        {/* Footer buttons */}
         <ChatFooter
           onHistory={() => setPage('history')}
           onStart={handleStart}
@@ -156,6 +154,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
