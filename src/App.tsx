@@ -14,17 +14,21 @@ const assistantId =
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 interface Props {
-  onBack: () => void; // supplied by Root (main.tsx)
+  onBack: () => void;
 }
 
 export default function App({ onBack }: Props) {
-  const { start, stop, sendText, transcripts } = useVapi(apiKey, assistantId);
+  const {
+    start,
+    stop,
+    sendText,
+    transcripts,
+    status,             // ← new
+  } = useVapi(apiKey, assistantId);
 
   const [page, setPage] = useState<'home' | 'history'>('home');
 
-  /* ─────────────────────────────
-     Mobile-safe call starter
-  ───────────────────────────── */
+  /* Mobile-safe call starter */
   const handleStart = () => {
     try {
       if (typeof window !== 'undefined' && 'AudioContext' in window) {
@@ -34,9 +38,7 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {
-      /* ignore */
-    }
+    } catch {/* ignore */}
     requestAnimationFrame(() => start());
   };
 
@@ -72,7 +74,7 @@ export default function App({ onBack }: Props) {
         fontFamily: 'sans-serif',
       }}
     >
-      {/* Back arrow to Landing */}
+      {/* Back arrow */}
       <IconButton
         onClick={onBack}
         sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
@@ -86,7 +88,7 @@ export default function App({ onBack }: Props) {
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Central avatar */}
+      {/* Central avatar + status */}
       <Box
         sx={{
           flexGrow: 1,
@@ -97,9 +99,16 @@ export default function App({ onBack }: Props) {
         }}
       >
         <AvatarPlaceholder />
+
+        {/* Calling indicator */}
+        {status === 'calling' && (
+          <Typography sx={{ mt: 2, color: 'grey.400' }}>
+            Calling…
+          </Typography>
+        )}
       </Box>
 
-      {/* Footer with history / start / stop buttons */}
+      {/* Footer */}
       <ChatFooter
         onHistory={() => setPage('history')}
         onStart={handleStart}
@@ -108,6 +117,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
