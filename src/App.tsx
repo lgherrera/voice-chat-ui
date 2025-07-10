@@ -27,24 +27,25 @@ export default function App({ onBack }: Props) {
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* flip from Calling → Connected in 2 s */
+  /* Flip “Calling…” → “Connected” after 2 s */
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined;
-    if (status === 'calling') t = setTimeout(() => setConnected(true), 2000);
-    else if (status === 'ended') {
+    if (status === 'calling') {
+      t = setTimeout(() => setConnected(true), 2000);
+    } else if (status === 'ended') {
       setDialing(false);
       setConnected(false);
     }
     return () => clearTimeout(t);
   }, [status]);
 
-  /* safe-start helper */
+  /* Mobile-safe call starter */
   const handleStart = () => {
     setDialing(true);
     requestAnimationFrame(() => start());
   };
 
-  /* history page */
+  /* ─── History page ─── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -57,7 +58,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* main page */
+  /* ─── Main voice page ─── */
   return (
     <Box
       sx={{
@@ -67,24 +68,40 @@ export default function App({ onBack }: Props) {
         mx: 'auto',
         height: '100dvh',
         display: 'flex',
-        flexDirection: 'column',     // column → header | scroller | footer
+        flexDirection: 'column',
         overflow: 'hidden',
         color: 'common.white',
       }}
     >
       <ChatBackground imageUrl="/maya-bg.jpg" />
 
-      {/* ─── HEADER (shrinks never) ─── */}
-      <Box sx={{ p: 2, flexShrink: 0, zIndex: 10 }}>
+      {/* HEADER (fixed height, centered text) */}
+      <Box
+        sx={{
+          flexShrink: 0,
+          p: 2,
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          zIndex: 10,
+        }}
+      >
+        {/* back arrow pinned to left */}
         <IconButton
           onClick={onBack}
-          sx={{ color: 'grey.300', mb: 1 }}
           aria-label="Back to landing"
+          sx={{
+            color: 'grey.300',
+            position: 'absolute',
+            left: 8,
+            top: 8,
+          }}
         >
           <ArrowBackIcon />
         </IconButton>
 
-        <Typography variant="h4" sx={{ fontWeight: 300 }}>
+        <Typography variant="h4" sx={{ fontWeight: 300, mt: 1 }}>
           Maya,&nbsp;24
         </Typography>
 
@@ -105,12 +122,12 @@ export default function App({ onBack }: Props) {
         )}
       </Box>
 
-      {/* ─── SCROLLER (grows & scrolls) ─── */}
+      {/* MESSAGE SCROLLER */}
       <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, zIndex: 10 }}>
         <MessageList messages={transcripts} />
       </Box>
 
-      {/* ─── FOOTER (pinned) ─── */}
+      {/* FOOTER (pinned) */}
       <ChatFooter
         onHistory={() => setPage('history')}
         onStart={handleStart}
@@ -119,6 +136,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
