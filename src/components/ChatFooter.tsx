@@ -31,22 +31,21 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
         <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
       </IconButton>
 
-      {/* start call */}
+      {/* start call – white icon on green circle */}
       <IconButton aria-label="Start call" onClick={onStart}>
         <Box
           sx={{
             width: { xs: 48, md: 64 },
             height: { xs: 48, md: 64 },
             borderRadius: '50%',
-            border: 3,
-            borderColor: 'primary.main',
+            bgcolor: 'success.main',             // ← solid green circle
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
           <PhoneIcon
-            sx={{ fontSize: { xs: 28, md: 36 }, color: 'primary.main' }}
+            sx={{ fontSize: { xs: 28, md: 36 }, color: 'common.white' }} // ← white icon
           />
         </Box>
       </IconButton>
@@ -77,3 +76,4 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
     </Box>
   </Box>
 );
+
