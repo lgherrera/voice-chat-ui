@@ -3,19 +3,18 @@ import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useVapi } from './hooks/useVapi';
-import { ChatBackground } from './components/chat';
-import { MessageList } from './components/chat';      // ← NEW
+import { ChatBackground, MessageList } from './components/chat'; // barrel exports
 import { ChatFooter } from './components/ChatFooter';
 import { TranscriptPage } from './components/chat';
 
-/* ───────────────────  ENV  ─────────────────── */
+/* ─── Env vars ─── */
 const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
   '5f788679-dd94-4cc5-901f-24daf04d1f48';
 
 interface Props {
-  onBack: () => void;
+  onBack: () => void; // supplied by main.tsx
 }
 
 export default function App({ onBack }: Props) {
@@ -28,7 +27,7 @@ export default function App({ onBack }: Props) {
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* ───────── Banner logic ───────── */
+  /* Flip banner to “Connected” 2 s after status === "calling" */
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined;
 
@@ -41,9 +40,10 @@ export default function App({ onBack }: Props) {
     return () => clearTimeout(t);
   }, [status]);
 
-  /* ───────── Start call ───────── */
+  /* One-tap call starter (mobile-safe) */
   const handleStart = () => {
     setDialing(true);
+
     try {
       if ('AudioContext' in window) {
         const Ctx =
@@ -52,7 +52,10 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {}
+    } catch {
+      /* ignore */
+    }
+
     requestAnimationFrame(() => start());
   };
 
@@ -75,18 +78,19 @@ export default function App({ onBack }: Props) {
       sx={{
         position: 'fixed',
         inset: 0,
-        width: '100%',
         maxWidth: 430,
         mx: 'auto',
         height: '100dvh',
-        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         color: 'common.white',
+        overflow: 'hidden',
       }}
     >
+      {/* Background layers */}
       <ChatBackground imageUrl="/maya-bg.jpg" />
 
+      {/* Scrollable content (header + banner + messages) */}
       <Box
         sx={{
           flexGrow: 1,
@@ -118,32 +122,31 @@ export default function App({ onBack }: Props) {
               fontSize: '20px',
               color: 'grey.300',
               textAlign: 'center',
-              animation: connected
-                ? 'none'
-                : 'blink 1s step-start infinite',
-              '@keyframes blink': { '50%': { opacity: 0 } },
               mb: 1,
+              animation: connected ? 'none' : 'blink 1s step-start infinite',
+              '@keyframes blink': { '50%': { opacity: 0 } },
             }}
           >
             {connected ? 'Connected' : 'Calling…'}
           </Typography>
         )}
 
-        {/* Scrollable message list */}
+        {/* Message scroll area */}
         <Box sx={{ flexGrow: 1, width: '100%' }}>
           <MessageList messages={transcripts} />
         </Box>
-
-        {/* Footer */}
-        <ChatFooter
-          onHistory={() => setPage('history')}
-          onStart={handleStart}
-          onStop={stop}
-        />
       </Box>
+
+      {/* Fixed footer (never scrolls) */}
+      <ChatFooter
+        onHistory={() => setPage('history')}
+        onStart={handleStart}
+        onStop={stop}
+      />
     </Box>
   );
 }
+
 
 
 
