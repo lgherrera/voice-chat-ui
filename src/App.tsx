@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -24,18 +24,22 @@ export default function App({ onBack }: Props) {
   );
 
   const [page, setPage] = useState<'home' | 'history'>('home');
-  const [hasConnected, setHasConnected] = useState(false);
-  const prevLen = useRef(transcripts.length);
+  const [connected, setConnected] = useState(false);
 
-  /* Detect first transcript → mark "Connected" */
+  /* ─────────────────────────────
+     Flip text 2 s after dialing
+  ───────────────────────────── */
   useEffect(() => {
-    if (status !== 'calling') {
-      setHasConnected(false);
-      prevLen.current = transcripts.length;
-    } else if (!hasConnected && transcripts.length > prevLen.current) {
-      setHasConnected(true);
+    let t: ReturnType<typeof setTimeout> | undefined;
+
+    if (status === 'calling') {
+      t = setTimeout(() => setConnected(true), 2000);
+    } else {
+      setConnected(false); // reset on idle/ended
     }
-  }, [status, transcripts.length, hasConnected]);
+
+    return () => clearTimeout(t);
+  }, [status]);
 
   /* Mobile-safe call starter */
   const handleStart = () => {
@@ -47,11 +51,11 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {/* ignore */}
+    } catch {}
     requestAnimationFrame(() => start());
   };
 
-  /* ───── Transcript History page ───── */
+  /* ───────── Transcript History page ───────── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -64,7 +68,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ───────── Main voice page ───────── */
+  /* ───────────── Main voice page ───────────── */
   return (
     <Box
       sx={{
@@ -80,7 +84,6 @@ export default function App({ onBack }: Props) {
         alignItems: 'center',
         justifyContent: 'space-between',
         p: 2,
-        fontFamily: 'sans-serif',
       }}
     >
       {/* Back arrow */}
@@ -113,7 +116,7 @@ export default function App({ onBack }: Props) {
           <Typography
             sx={{ mt: 2, color: 'grey.400', fontSize: '20px' }}
           >
-            {hasConnected ? 'Connected' : 'Calling…'}
+            {connected ? 'Connected' : 'Calling…'}
           </Typography>
         )}
       </Box>
@@ -127,6 +130,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
