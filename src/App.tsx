@@ -24,22 +24,28 @@ export default function App({ onBack }: Props) {
   );
 
   const [page, setPage] = useState<'home' | 'history'>('home');
+  const [dialing, setDialing] = useState(false);  // ← new
   const [connected, setConnected] = useState(false);
 
-  /* ───────── Flip text 2 s after dialing ───────── */
+  /* Flip to “Connected” 2 s after dialing */
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
+    let t: ReturnType<typeof setTimeout> | undefined;
 
-    if (status === 'calling') {
-      timer = setTimeout(() => setConnected(true), 2000);
-    } else {
-      setConnected(false); // reset on idle / ended
+    if (dialing) {                              // timer starts sooner
+      t = setTimeout(() => setConnected(true), 2000);
     }
-    return () => clearTimeout(timer);
-  }, [status]);
 
-  /* ───────── Mobile-safe call starter ───────── */
+    if (status !== 'calling') {                 // reset on idle / ended
+      setDialing(false);
+      setConnected(false);
+    }
+
+    return () => clearTimeout(t);
+  }, [dialing, status]);
+
+  /* Mobile-safe call starter */
   const handleStart = () => {
+    setDialing(true);                           // show banner right away
     try {
       if ('AudioContext' in window) {
         const Ctx =
@@ -48,11 +54,11 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {/* ignore */ }
+    } catch {/* ignore */}
     requestAnimationFrame(() => start());
   };
 
-  /* ───────── History page ───────── */
+  /* ─── History page ─── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -65,7 +71,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ───────── Main voice page ───────── */
+  /* ─── Main voice page ─── */
   return (
     <Box
       sx={{
@@ -109,7 +115,7 @@ export default function App({ onBack }: Props) {
       >
         <AvatarPlaceholder />
 
-        {status === 'calling' && (
+        {(dialing || status === 'calling') && (
           <Typography
             sx={{
               mt: 2,
@@ -126,7 +132,7 @@ export default function App({ onBack }: Props) {
         )}
       </Box>
 
-      {/* Footer buttons */}
+      {/* Footer */}
       <ChatFooter
         onHistory={() => setPage('history')}
         onStart={handleStart}
@@ -135,6 +141,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
