@@ -26,22 +26,19 @@ export default function App({ onBack }: Props) {
   const [page, setPage] = useState<'home' | 'history'>('home');
   const [connected, setConnected] = useState(false);
 
-  /* ─────────────────────────────
-     Flip text 2 s after dialing
-  ───────────────────────────── */
+  /* ───────── Flip text 2 s after dialing ───────── */
   useEffect(() => {
-    let t: ReturnType<typeof setTimeout> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
 
     if (status === 'calling') {
-      t = setTimeout(() => setConnected(true), 2000);
+      timer = setTimeout(() => setConnected(true), 2000);
     } else {
-      setConnected(false); // reset on idle/ended
+      setConnected(false); // reset on idle / ended
     }
-
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [status]);
 
-  /* Mobile-safe call starter */
+  /* ───────── Mobile-safe call starter ───────── */
   const handleStart = () => {
     try {
       if ('AudioContext' in window) {
@@ -51,11 +48,11 @@ export default function App({ onBack }: Props) {
         if (ctx.state === 'suspended') ctx.resume();
         ctx.close();
       }
-    } catch {}
+    } catch {/* ignore */ }
     requestAnimationFrame(() => start());
   };
 
-  /* ───────── Transcript History page ───────── */
+  /* ───────── History page ───────── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -68,7 +65,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ───────────── Main voice page ───────────── */
+  /* ───────── Main voice page ───────── */
   return (
     <Box
       sx={{
@@ -114,7 +111,15 @@ export default function App({ onBack }: Props) {
 
         {status === 'calling' && (
           <Typography
-            sx={{ mt: 2, color: 'grey.400', fontSize: '20px' }}
+            sx={{
+              mt: 2,
+              fontSize: '20px',
+              color: 'grey.400',
+              animation: connected ? 'none' : 'blink 1s step-start infinite',
+              '@keyframes blink': {
+                '50%': { opacity: 0 },
+              },
+            }}
           >
             {connected ? 'Connected' : 'Calling…'}
           </Typography>
@@ -130,6 +135,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
