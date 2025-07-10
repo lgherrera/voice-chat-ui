@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -18,20 +18,29 @@ interface Props {
 }
 
 export default function App({ onBack }: Props) {
-  const {
-    start,
-    stop,
-    sendText,
-    transcripts,
-    status,             // ← new
-  } = useVapi(apiKey, assistantId);
+  const { start, stop, sendText, transcripts, status } = useVapi(
+    apiKey,
+    assistantId,
+  );
 
   const [page, setPage] = useState<'home' | 'history'>('home');
+  const [hasConnected, setHasConnected] = useState(false);
+  const prevLen = useRef(transcripts.length);
+
+  /* Detect first transcript → mark "Connected" */
+  useEffect(() => {
+    if (status !== 'calling') {
+      setHasConnected(false);
+      prevLen.current = transcripts.length;
+    } else if (!hasConnected && transcripts.length > prevLen.current) {
+      setHasConnected(true);
+    }
+  }, [status, transcripts.length, hasConnected]);
 
   /* Mobile-safe call starter */
   const handleStart = () => {
     try {
-      if (typeof window !== 'undefined' && 'AudioContext' in window) {
+      if ('AudioContext' in window) {
         const Ctx =
           (window as any).AudioContext || (window as any).webkitAudioContext;
         const ctx = new Ctx();
@@ -42,7 +51,7 @@ export default function App({ onBack }: Props) {
     requestAnimationFrame(() => start());
   };
 
-  /* ───────── Transcript History page ───────── */
+  /* ───── Transcript History page ───── */
   if (page === 'history') {
     return (
       <TranscriptPage
@@ -55,7 +64,7 @@ export default function App({ onBack }: Props) {
     );
   }
 
-  /* ───────────── Main voice page ───────────── */
+  /* ───────── Main voice page ───────── */
   return (
     <Box
       sx={{
@@ -88,7 +97,7 @@ export default function App({ onBack }: Props) {
         Let’s&nbsp;Have&nbsp;a&nbsp;Chat
       </Typography>
 
-      {/* Central avatar + status */}
+      {/* Avatar + call status */}
       <Box
         sx={{
           flexGrow: 1,
@@ -100,15 +109,16 @@ export default function App({ onBack }: Props) {
       >
         <AvatarPlaceholder />
 
-        {/* Calling indicator */}
         {status === 'calling' && (
-          <Typography sx={{ mt: 2, color: 'grey.400' }}>
-            Calling…
+          <Typography
+            sx={{ mt: 2, color: 'grey.400', fontSize: '20px' }}
+          >
+            {hasConnected ? 'Connected' : 'Calling…'}
           </Typography>
         )}
       </Box>
 
-      {/* Footer */}
+      {/* Footer buttons */}
       <ChatFooter
         onHistory={() => setPage('history')}
         onStart={handleStart}
@@ -117,6 +127,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
