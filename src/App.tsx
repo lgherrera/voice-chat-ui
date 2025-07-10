@@ -4,6 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useVapi } from './hooks/useVapi';
 import { ChatBackground } from './components/chat';
+import { MessageList } from './components/chat';      // ← NEW
 import { ChatFooter } from './components/ChatFooter';
 import { TranscriptPage } from './components/chat';
 
@@ -30,6 +31,7 @@ export default function App({ onBack }: Props) {
   /* ───────── Banner logic ───────── */
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined;
+
     if (status === 'calling') {
       t = setTimeout(() => setConnected(true), 2000);
     } else if (status === 'ended') {
@@ -90,13 +92,12 @@ export default function App({ onBack }: Props) {
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           p: 2,
           position: 'relative',
           zIndex: 10,
         }}
       >
+        {/* Back arrow */}
         <IconButton
           onClick={onBack}
           sx={{ color: 'grey.300', alignSelf: 'flex-start', mb: 1 }}
@@ -105,36 +106,35 @@ export default function App({ onBack }: Props) {
           <ArrowBackIcon />
         </IconButton>
 
-        <Typography variant="h4" sx={{ mb: 2, fontWeight: 300 }}>
+        {/* Header */}
+        <Typography variant="h4" sx={{ mb: 1, fontWeight: 300 }}>
           Maya,&nbsp;24
         </Typography>
 
-        {/* Center banner (no avatar) */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {dialing && (
-            <Typography
-              sx={{
-                fontSize: '20px',
-                color: 'grey.300',
-                animation: connected
-                  ? 'none'
-                  : 'blink 1s step-start infinite',
-                '@keyframes blink': { '50%': { opacity: 0 } },
-              }}
-            >
-              {connected ? 'Connected' : 'Calling…'}
-            </Typography>
-          )}
+        {/* Calling / Connected banner */}
+        {dialing && (
+          <Typography
+            sx={{
+              fontSize: '20px',
+              color: 'grey.300',
+              textAlign: 'center',
+              animation: connected
+                ? 'none'
+                : 'blink 1s step-start infinite',
+              '@keyframes blink': { '50%': { opacity: 0 } },
+              mb: 1,
+            }}
+          >
+            {connected ? 'Connected' : 'Calling…'}
+          </Typography>
+        )}
+
+        {/* Scrollable message list */}
+        <Box sx={{ flexGrow: 1, width: '100%' }}>
+          <MessageList messages={transcripts} />
         </Box>
 
+        {/* Footer */}
         <ChatFooter
           onHistory={() => setPage('history')}
           onStart={handleStart}
@@ -144,6 +144,7 @@ export default function App({ onBack }: Props) {
     </Box>
   );
 }
+
 
 
 
