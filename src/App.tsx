@@ -3,10 +3,9 @@ import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { useVapi } from './hooks/useVapi';
-import { ChatBackground, MessageList } from './components/chat';
-import { ChatFooter } from './components/ChatFooter';
+import { ChatBackground, MessageList, ChatFooter } from './components/chat'; // barrel exports
 
-/* ─── ENV ─── */
+/* ─── Environment keys ─── */
 const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
 const assistantId =
   import.meta.env.VITE_VAPI_ASSISTANT_ID ??
@@ -17,27 +16,24 @@ interface Props {
 }
 
 export default function App({ onBack }: Props) {
-  const { start, stop, sendText, transcripts, status } = useVapi(
-    apiKey,
-    assistantId,
-  );
+  const { start, stop, transcripts, status } = useVapi(apiKey, assistantId);
 
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* “Calling…” → “Connected” after 2 s */
+  /* Flip from “Calling…” to “Connected” two seconds after dialing */
   useEffect(() => {
-    let t: ReturnType<typeof setTimeout> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (status === 'calling') {
-      t = setTimeout(() => setConnected(true), 2000);
+      timer = setTimeout(() => setConnected(true), 2000);
     } else if (status === 'ended') {
       setDialing(false);
       setConnected(false);
     }
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [status]);
 
-  /* start call */
+  /* Start call helper (mobile-safe) */
   const handleStart = () => {
     setDialing(true);
     requestAnimationFrame(() => start());
@@ -57,9 +53,10 @@ export default function App({ onBack }: Props) {
         color: 'common.white',
       }}
     >
+      {/* Background image + dark overlay */}
       <ChatBackground imageUrl="/maya-bg.jpg" />
 
-      {/* HEADER */}
+      {/* ─── Header (pinned) ─── */}
       <Box
         sx={{
           flexShrink: 0,
@@ -71,6 +68,7 @@ export default function App({ onBack }: Props) {
           zIndex: 10,
         }}
       >
+        {/* Back arrow (floats on left) */}
         <IconButton
           onClick={onBack}
           aria-label="Back"
@@ -98,20 +96,21 @@ export default function App({ onBack }: Props) {
         )}
       </Box>
 
-      {/* MESSAGES */}
+      {/* ─── Scrollable messages ─── */}
       <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, zIndex: 10 }}>
         <MessageList messages={transcripts} />
       </Box>
 
-      {/* FOOTER (history button removed) */}
+      {/* ─── Footer (pinned) ─── */}
       <ChatFooter
-        onHistory={() => { /* history removed */ }}
+        onHistory={() => {/* history disabled */}}
         onStart={handleStart}
         onStop={stop}
       />
     </Box>
   );
 }
+
 
 
 
