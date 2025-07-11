@@ -5,7 +5,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useVapi } from './hooks/useVapi';
 import { ChatBackground, MessageList } from './components/chat';
 import { ChatFooter } from './components/ChatFooter';
-import { TranscriptPage } from './components/chat';
 
 /* ─── ENV ─── */
 const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
@@ -23,11 +22,10 @@ export default function App({ onBack }: Props) {
     assistantId,
   );
 
-  const [page, setPage] = useState<'home' | 'history'>('home');
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  /* Flip “Calling…” → “Connected” after 2 s */
+  /* “Calling…” → “Connected” after 2 s */
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined;
     if (status === 'calling') {
@@ -39,26 +37,12 @@ export default function App({ onBack }: Props) {
     return () => clearTimeout(t);
   }, [status]);
 
-  /* Mobile-safe call starter */
+  /* start call */
   const handleStart = () => {
     setDialing(true);
     requestAnimationFrame(() => start());
   };
 
-  /* ─── History page ─── */
-  if (page === 'history') {
-    return (
-      <TranscriptPage
-        transcripts={transcripts}
-        personaId="maya"
-        onBack={() => setPage('home')}
-        onSend={sendText}
-        onCall={handleStart}
-      />
-    );
-  }
-
-  /* ─── Main voice page ─── */
   return (
     <Box
       sx={{
@@ -75,7 +59,7 @@ export default function App({ onBack }: Props) {
     >
       <ChatBackground imageUrl="/maya-bg.jpg" />
 
-      {/* HEADER (fixed height, centered text) */}
+      {/* HEADER */}
       <Box
         sx={{
           flexShrink: 0,
@@ -87,16 +71,10 @@ export default function App({ onBack }: Props) {
           zIndex: 10,
         }}
       >
-        {/* back arrow pinned to left */}
         <IconButton
           onClick={onBack}
-          aria-label="Back to landing"
-          sx={{
-            color: 'grey.300',
-            position: 'absolute',
-            left: 8,
-            top: 8,
-          }}
+          aria-label="Back"
+          sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}
         >
           <ArrowBackIcon />
         </IconButton>
@@ -111,9 +89,7 @@ export default function App({ onBack }: Props) {
               mt: 1,
               fontSize: '20px',
               color: 'grey.300',
-              animation: connected
-                ? 'none'
-                : 'blink 1s step-start infinite',
+              animation: connected ? 'none' : 'blink 1s step-start infinite',
               '@keyframes blink': { '50%': { opacity: 0 } },
             }}
           >
@@ -122,20 +98,21 @@ export default function App({ onBack }: Props) {
         )}
       </Box>
 
-      {/* MESSAGE SCROLLER */}
+      {/* MESSAGES */}
       <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, zIndex: 10 }}>
         <MessageList messages={transcripts} />
       </Box>
 
-      {/* FOOTER (pinned) */}
+      {/* FOOTER (history button removed) */}
       <ChatFooter
-        onHistory={() => setPage('history')}
+        onHistory={() => { /* history removed */ }}
         onStart={handleStart}
         onStop={stop}
       />
     </Box>
   );
 }
+
 
 
 
