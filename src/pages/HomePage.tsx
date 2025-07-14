@@ -9,23 +9,11 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-// ✅ Corrected import path:
 import { ProfileCard } from '@/components/ProfileCard';
 import { PERSONAS, type Persona } from '@/constants/personas';
 
 export default function HomePage() {
   const navigate = useNavigate();
-
-  const handleSubscribe = () => {
-    // TODO: wire up your subscription flow here
-  };
-
-  const cards = Object.values(PERSONAS).map((p: Persona) => ({
-    imageUrl: p.imageUrl,
-    headline: `${p.name}, ${p.age}`,
-    bio: p.bio,
-    onClick: () => navigate(`/chat/${p.id}`),
-  }));
 
   return (
     <Box
@@ -56,7 +44,7 @@ export default function HomePage() {
         <Button
           variant="contained"
           sx={{ borderRadius: '32px', px: 3, py: 1 }}
-          onClick={handleSubscribe}
+          onClick={() => {/* handle subscribe if needed */}}
         >
           SUSCRÍBETE
         </Button>
@@ -68,7 +56,7 @@ export default function HomePage() {
 
       <Divider sx={{ borderColor: 'grey.800' }} />
 
-      {/* Scrollable persona cards */}
+      {/* Scrollable cards */}
       <Box
         sx={{
           flexGrow: 1,
@@ -80,19 +68,22 @@ export default function HomePage() {
           gap: 6,
         }}
       >
-        {cards.map((c) => (
+        {Object.values(PERSONAS).map((p: Persona) => (
           <ProfileCard
-            key={c.headline}
-            imageUrl={c.imageUrl}
-            headline={c.headline}
-            bio={c.bio}
-            onClick={c.onClick}
+            key={p.id}
+            imageUrl={p.imageUrl}
+            headline={`${p.name}, ${p.age}`}
+            bio={p.bio}
+            onClick={() => navigate(`/chat/${p.id}`)}
           />
         ))}
       </Box>
     </Box>
   );
 }
+
+
+
 
 
 
