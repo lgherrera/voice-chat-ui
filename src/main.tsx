@@ -1,26 +1,41 @@
-import { useState } from 'react';
+// src/main.tsx
+import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import { LandingPage } from './components/LandingPage';
-import './index.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-/**
- * Root component:
- * ─ shows <LandingPage> first
- * ─ swaps to <App> when user taps “Start Chat”
- * ─ lets <App> return via onBack()
- */
-function Root() {
-  const [started, setStarted] = useState(false);
+import HomePage from '@/pages/HomePage';
+import ChatPage, { loader as chatLoader } from '@/pages/ChatPage';
+import NotFound from '@/pages/NotFound';
 
-  return started ? (
-    <App onBack={() => setStarted(false)} />
-  ) : (
-    <LandingPage onStart={() => setStarted(true)} />
-  );
-}
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <HomePage />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: '/chat/:personaId',
+    element: <ChatPage />,
+    loader: chatLoader,
+    errorElement: <NotFound />,
+  },
+  {
+    path: '*',
+    element: <NotFound />,
+  },
+]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(<Root />);
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
+);
+
+
+
+
+
+
 
 
 

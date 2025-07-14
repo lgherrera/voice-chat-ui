@@ -1,4 +1,6 @@
+// src/pages/HomePage.tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -7,33 +9,23 @@ import {
   Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { ProfileCard } from './ProfileCard';
+// ✅ Corrected import path:
+import { ProfileCard } from '@/components/ProfileCard';
+import { PERSONAS, type Persona } from '@/constants/personas';
 
-interface Props {
-  onStart: () => void;
-}
+export default function HomePage() {
+  const navigate = useNavigate();
 
-export const LandingPage: React.FC<Props> = ({ onStart }) => {
-  /* Card data */
-  const cards = [
-    {
-      imageUrl: '/img1.jpg',
-      headline: 'Maya, 24',
-      bio: 'Amo los animales, amo mi trabajo, soy tranquila, me gusta leer y ver series en Netflix.',
-      onClick: onStart,
-    },
-    {
-      imageUrl: '/img2.jpg',
-      headline: 'Valentina, 23',
-      bio: 'Fanática de los deportes, la vida al aire libre, la buena alimentación, y las amistades duraderas.',
-    },
-    /* NEW – Fernanda */
-    {
-      imageUrl: '/img3.jpg',
-      headline: 'Fernanda, 27',
-      bio: 'Amo la noche, la fiesta y los novios.',
-    },
-  ];
+  const handleSubscribe = () => {
+    // TODO: wire up your subscription flow here
+  };
+
+  const cards = Object.values(PERSONAS).map((p: Persona) => ({
+    imageUrl: p.imageUrl,
+    headline: `${p.name}, ${p.age}`,
+    bio: p.bio,
+    onClick: () => navigate(`/chat/${p.id}`),
+  }));
 
   return (
     <Box
@@ -64,7 +56,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => {
         <Button
           variant="contained"
           sx={{ borderRadius: '32px', px: 3, py: 1 }}
-          onClick={onStart}
+          onClick={handleSubscribe}
         >
           SUSCRÍBETE
         </Button>
@@ -76,7 +68,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => {
 
       <Divider sx={{ borderColor: 'grey.800' }} />
 
-      {/* Scrollable cards */}
+      {/* Scrollable persona cards */}
       <Box
         sx={{
           flexGrow: 1,
@@ -100,13 +92,7 @@ export const LandingPage: React.FC<Props> = ({ onStart }) => {
       </Box>
     </Box>
   );
-};
-
-
-
-
-
-
+}
 
 
 
