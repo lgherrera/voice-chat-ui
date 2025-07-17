@@ -1,6 +1,6 @@
 // src/pages/SignIn.tsx
 import React from 'react';
-import { Auth } from '@supabase/auth-ui-react';
+import { Auth, Appearance } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -10,7 +10,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-// 👇 Import the ProfileCard component from its new file 👇
 import { ProfileCard } from '@/components/ProfileCard';
 
 const darkTheme = createTheme({
@@ -19,11 +18,28 @@ const darkTheme = createTheme({
   },
 });
 
+const customAppearance: Appearance = {
+  theme: ThemeSupa,
+  style: {
+    label: {
+      display: 'block',
+      width: '80%',
+      margin: '0 auto 0.5rem auto',
+    },
+    input: {
+      display: 'block',
+      width: '80%',
+      margin: '0 auto 1rem auto',
+      color: '#fff',
+    },
+  },
+};
+
 export default function SignIn() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <div style={{ maxWidth: 400, margin: '4rem auto' }}>
+      <div style={{ maxWidth: 400, margin: '1rem auto' }}>
         {/* Header */}
         <Box
           sx={{
@@ -42,7 +58,7 @@ export default function SignIn() {
         {/* Supabase Auth Form */}
         <Auth
           supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
+          appearance={customAppearance}
           providers={[]}
           magicLink
         />
