@@ -2,25 +2,35 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useLoaderData, useNavigate, type LoaderFunctionArgs } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';   // 👈 swap imports
 
 import { PERSONAS, type Persona } from '@/constants/personas';
 import { useVapi } from '@/hooks/useVapi';
 import { MessageList, ChatFooter } from '@/components/chat';
 
-/* ─── Route loader ────────────────────────────────────── */
-export async function loader({ params }: LoaderFunctionArgs) {
-  const personaId = params.personaId ?? '';
-  const persona = PERSONAS[personaId];
-  if (!persona) {
-    throw new Response('Not Found', { status: 404 });
-  }
-  return persona;
-}
-
 /* ─── Component ───────────────────────────────────────── */
 export default function ChatPage() {
-  const persona = useLoaderData() as Persona;
+  /* 🔄 instead of useLoaderData() */
+  const { personaId } = useParams<{ personaId: string }>();
+  const persona: Persona | undefined = personaId
+    ? PERSONAS[personaId as keyof typeof PERSONAS]
+    : undefined;
+
+  const navigate = useNavigate();
+
+  /* 👉 handle unknown ID gracefully */
+  if (!persona) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Typography variant="h6">Persona not found</Typography>
+        <IconButton onClick={() => navigate('/')}>
+          <ArrowBackIcon />
+        </IconButton>
+      </Box>
+    );
+  }
+
+  /* ─── Original logic unchanged ─── */
   const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
   const { start, stop, transcripts, status } = useVapi(
     apiKey,
@@ -45,8 +55,6 @@ export default function ChatPage() {
     setDialing(true);
     requestAnimationFrame(() => start());
   };
-
-  const navigate = useNavigate();
 
   return (
     <Box
@@ -78,7 +86,7 @@ export default function ChatPage() {
         }}
       />
 
-      {/* Header (zIndex:1) */}
+      {/* Header */}
       <Box
         sx={{
           position: 'relative',
@@ -108,9 +116,7 @@ export default function ChatPage() {
               mt: 1,
               fontSize: '20px',
               color: 'grey.300',
-              animation: connected
-                ? 'none'
-                : 'blink 1s step-start infinite',
+              animation: connected ? 'none' : 'blink 1s step-start infinite',
               '@keyframes blink': { '50%': { opacity: 0 } },
             }}
           >
@@ -119,7 +125,7 @@ export default function ChatPage() {
         )}
       </Box>
 
-      {/* Messages (zIndex:1) */}
+      {/* Messages */}
       <Box
         sx={{
           position: 'relative',
@@ -132,7 +138,7 @@ export default function ChatPage() {
         <MessageList messages={transcripts} />
       </Box>
 
-      {/* Footer (zIndex:1) */}
+      {/* Footer */}
       <Box
         sx={{
           position: 'relative',
@@ -145,6 +151,8 @@ export default function ChatPage() {
     </Box>
   );
 }
+
+
 
 
 

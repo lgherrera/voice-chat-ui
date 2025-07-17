@@ -1,35 +1,18 @@
 // src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import HomePage from '@/pages/HomePage';
-import ChatPage, { loader as chatLoader } from '@/pages/ChatPage';
-import NotFound from '@/pages/NotFound';
+import App from '@/App';      // make sure "@" is aliased to /src in your Vite/tsconfig
+import './index.css';         // keep or remove if you don’t use a global stylesheet
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <HomePage />,
-    errorElement: <NotFound />,
-  },
-  {
-    path: '/chat/:personaId',
-    element: <ChatPage />,
-    loader: chatLoader,
-    errorElement: <NotFound />,
-  },
-  {
-    path: '*',
-    element: <NotFound />,
-  },
-]);
-
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </React.StrictMode>
 );
+
 
 
 

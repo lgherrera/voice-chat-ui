@@ -7,13 +7,35 @@ import {
   Divider,
   IconButton,
   Typography,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+
+import { supabase } from '@/lib/supabaseClient';
 import { ProfileCard } from '@/components/ProfileCard';
 import { PERSONAS, type Persona } from '@/constants/personas';
 
 export default function HomePage() {
   const navigate = useNavigate();
+
+  /** ───── Menu state ───── */
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    handleMenuClose();
+    navigate('/signin', { replace: true });
+  };
 
   return (
     <Box
@@ -28,7 +50,7 @@ export default function HomePage() {
         flexDirection: 'column',
       }}
     >
-      {/* Header */}
+      {/* ───── Header ───── */}
       <Box
         sx={{
           display: 'flex',
@@ -44,19 +66,32 @@ export default function HomePage() {
         <Button
           variant="contained"
           sx={{ borderRadius: '32px', px: 3, py: 1 }}
-          onClick={() => {/* handle subscribe if needed */}}
+          onClick={() => {
+            /* handle subscribe if needed */
+          }}
         >
           SUSCRÍBETE
         </Button>
 
-        <IconButton sx={{ color: 'white' }}>
+        <IconButton sx={{ color: 'white' }} onClick={handleMenuClick}>
           <MenuIcon />
         </IconButton>
+
+        {/* ───── Dropdown menu ───── */}
+        <Menu
+          anchorEl={anchorEl}
+          open={menuOpen}
+          onClose={handleMenuClose}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
+        </Menu>
       </Box>
 
       <Divider sx={{ borderColor: 'grey.800' }} />
 
-      {/* Scrollable cards */}
+      {/* ───── Scrollable cards ───── */}
       <Box
         sx={{
           flexGrow: 1,
@@ -81,6 +116,7 @@ export default function HomePage() {
     </Box>
   );
 }
+
 
 
 
