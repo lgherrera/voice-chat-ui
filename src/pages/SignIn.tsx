@@ -1,7 +1,7 @@
 // src/pages/SignIn.tsx
 import React from 'react';
 import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa, Appearance } from '@supabase/auth-ui-shared';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/lib/supabaseClient';
 
 // Import MUI components
@@ -18,10 +18,19 @@ const darkTheme = createTheme({
   },
 });
 
-const customAppearance: Appearance = {
+// The custom appearance object with NO explicit type annotation
+const customAppearance = {
   theme: ThemeSupa,
   style: {
+    label: {
+      display: 'block',
+      width: '80%',
+      margin: '0 auto 0.5rem auto',
+    },
     input: {
+      display: 'block',
+      width: '80%',
+      margin: '0 auto 1rem auto',
       color: '#fff',
     },
   },
@@ -31,8 +40,7 @@ export default function SignIn() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      {/* 👇 The change is in this line 👇 */}
-      <div style={{ maxWidth: 400, margin: '2rem auto' }}>
+      <div style={{ maxWidth: 400, margin: '1rem auto' }}>
         {/* Header */}
         <Box
           sx={{
@@ -59,9 +67,9 @@ export default function SignIn() {
         {/* Footer */}
         <Box sx={{ p: 2, borderTop: '1px solid #333', mt: 2 }}>
           <ProfileCard
-            imageUrl="https://images.unsplash.com/photo-1610484826917-0f101a6bf7f4?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=600"
-            headline="Meet Our Star Persona"
-            bio="Powered by the latest in AI technology to provide seamless, empathetic conversations."
+            imageUrl="https://voice-chat-ui-gules.vercel.app/preview-fernanda.jpg"
+            headline="Fernanda, 28"
+            bio="A thoughtful and supportive guide who enjoys in-depth discussions on books and philosophy."
           />
         </Box>
       </div>
