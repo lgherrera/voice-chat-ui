@@ -1,7 +1,7 @@
 // src/pages/SignIn.tsx
 import React from 'react';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa, Appearance } from '@supabase/auth-ui-shared';
+import { Auth, Appearance } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/lib/supabaseClient';
 
 // Import MUI components
@@ -18,21 +18,18 @@ const darkTheme = createTheme({
   },
 });
 
-// 👇 Define the custom appearance object with the new label styles 👇
 const customAppearance: Appearance = {
   theme: ThemeSupa,
   style: {
-    // Style for the labels ("Email address", "Your Password")
     label: {
       display: 'block',
       width: '80%',
-      margin: '0 auto 0.5rem auto', // Centers the label and adds space below it
+      margin: '0 auto 0.5rem auto',
     },
-    // Style for the input fields
     input: {
       display: 'block',
       width: '80%',
-      margin: '0 auto 1rem auto', // Centers the input and adds space before the next label
+      margin: '0 auto 1rem auto',
       color: '#fff',
     },
   },
