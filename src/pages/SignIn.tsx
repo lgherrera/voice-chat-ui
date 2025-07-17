@@ -1,7 +1,7 @@
 // src/pages/SignIn.tsx
 import React from 'react';
 import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa, Appearance } from '@supabase/auth-ui-shared';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/lib/supabaseClient';
 
 // Import MUI components
@@ -18,8 +18,8 @@ const darkTheme = createTheme({
   },
 });
 
-// The custom appearance object with type annotation
-const customAppearance: Appearance = {
+// The custom appearance object (type is inferred automatically)
+const customAppearance = {
   theme: ThemeSupa,
   style: {
     label: {
@@ -33,7 +33,6 @@ const customAppearance: Appearance = {
       margin: '0 auto 1rem auto',
       color: '#fff',
     },
-    // 👇 Style added for the button 👇
     button: {
       display: 'block',
       width: '80%',
@@ -82,6 +81,7 @@ export default function SignIn() {
     </ThemeProvider>
   );
 }
+
 
 
 
