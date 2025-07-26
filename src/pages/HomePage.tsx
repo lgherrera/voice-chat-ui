@@ -23,6 +23,25 @@ export default function HomePage() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
+  // ───── ADD THIS USEEFFECT HOOK ─────
+  React.useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // This event fires when the user clicks the password reset link.
+        // We redirect them to a dedicated page to update their password.
+        navigate('/update-password');
+      }
+    });
+
+    // Cleanup the subscription when the component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+  // ───── END OF ADDED CODE ─────
+
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
