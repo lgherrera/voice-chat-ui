@@ -9,20 +9,46 @@ import {
   Typography,
   Menu,
   MenuItem,
+  CircularProgress,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { supabase } from '@/lib/supabaseClient';
 import { ProfileCard } from '@/components/ProfileCard';
-import { PERSONAS, type Persona } from '@/constants/personas';
 
-// NO useEffect or onAuthStateChange listener needed here anymore.
+type Persona = {
+  id: string;
+  name: string;
+  age: number;
+  imageUrl: string;
+  bio: string | null;
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
 
+  const [personas, setPersonas] = React.useState<Persona[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
+
+  React.useEffect(() => {
+    const fetchPersonas = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('personas')
+        .select('id, name, age, bio, imageUrl:image_url');
+
+      if (error) {
+        console.error('Error fetching personas:', error);
+      } else if (data) {
+        setPersonas(data as Persona[]);
+      }
+      setLoading(false);
+    };
+
+    fetchPersonas();
+  }, []); // Runs once on page load
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -51,7 +77,6 @@ export default function HomePage() {
         flexDirection: 'column',
       }}
     >
-      {/* The rest of your JSX remains the same... */}
       {/* ───── Header ───── */}
       <Box
         sx={{
@@ -68,9 +93,7 @@ export default function HomePage() {
         <Button
           variant="contained"
           sx={{ borderRadius: '32px', px: 3, py: 1 }}
-          onClick={() => {
-            /* handle subscribe if needed */
-          }}
+          onClick={() => {}}
         >
           SUSCRÍBETE
         </Button>
@@ -104,15 +127,21 @@ export default function HomePage() {
           gap: 6,
         }}
       >
-        {Object.values(PERSONAS).map((p: Persona) => (
-          <ProfileCard
-            key={p.id}
-            imageUrl={p.imageUrl}
-            headline={`${p.name}, ${p.age}`}
-            bio={p.bio}
-            onClick={() => navigate(`/chat/${p.id}`)}
-          />
-        ))}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+            <CircularProgress color="inherit" />
+          </Box>
+        ) : (
+          personas.map((p: Persona) => (
+            <ProfileCard
+              key={p.id}
+              imageUrl={p.imageUrl}
+              headline={`${p.name}, ${p.age}`}
+              bio={p.bio}
+              onClick={() => navigate(`/chat/${p.id}`)}
+            />
+          ))
+        )}
       </Box>
     </Box>
   );
