@@ -16,31 +16,13 @@ import { supabase } from '@/lib/supabaseClient';
 import { ProfileCard } from '@/components/ProfileCard';
 import { PERSONAS, type Persona } from '@/constants/personas';
 
+// NO useEffect or onAuthStateChange listener needed here anymore.
+
 export default function HomePage() {
   const navigate = useNavigate();
 
-  /** ───── Menu state ───── */
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
-
-  // ───── ADD THIS USEEFFECT HOOK ─────
-  React.useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        // This event fires when the user clicks the password reset link.
-        // We redirect them to a dedicated page to update their password.
-        navigate('/update-password');
-      }
-    });
-
-    // Cleanup the subscription when the component unmounts
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
-  // ───── END OF ADDED CODE ─────
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -69,6 +51,7 @@ export default function HomePage() {
         flexDirection: 'column',
       }}
     >
+      {/* The rest of your JSX remains the same... */}
       {/* ───── Header ───── */}
       <Box
         sx={{
@@ -96,7 +79,6 @@ export default function HomePage() {
           <MenuIcon />
         </IconButton>
 
-        {/* ───── Dropdown menu ───── */}
         <Menu
           anchorEl={anchorEl}
           open={menuOpen}
