@@ -60,7 +60,7 @@ export default function HomePage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    handleMenuClose();
+    handleMenuCode();
     navigate('/signin', { replace: true });
   };
 
@@ -95,7 +95,7 @@ export default function HomePage() {
           sx={{ borderRadius: '32px', px: 3, py: 1 }}
           onClick={() => {}}
         >
-          SUSCRÍBETE
+          UPGRADE
         </Button>
 
         <IconButton sx={{ color: 'white' }} onClick={handleMenuClick}>
@@ -137,7 +137,7 @@ export default function HomePage() {
               key={p.id}
               imageUrl={p.imageUrl}
               headline={`${p.name}, ${p.age}`}
-              bio={p.bio}
+              bio={p.bio ?? ''} // 👈 THIS IS THE FIX
               onClick={() => navigate(`/chat/${p.id}`)}
             />
           ))
