@@ -60,7 +60,7 @@ export default function HomePage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    handleMenuCode();
+    handleMenuClose(); // 👈 THIS IS THE FIX
     navigate('/signin', { replace: true });
   };
 
@@ -137,7 +137,7 @@ export default function HomePage() {
               key={p.id}
               imageUrl={p.imageUrl}
               headline={`${p.name}, ${p.age}`}
-              bio={p.bio ?? ''} // 👈 THIS IS THE FIX
+              bio={p.bio ?? ''}
               onClick={() => navigate(`/chat/${p.id}`)}
             />
           ))
