@@ -1,36 +1,87 @@
 // src/pages/ChatPage.tsx
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useParams, useNavigate } from 'react-router-dom';   // 👈 swap imports
+import { useParams, useNavigate } from 'react-router-dom';
 
-import { PERSONAS, type Persona } from '@/constants/personas';
+import { supabase } from '@/lib/supabaseClient';
+import type { Persona } from '@/types';
 import { useVapi } from '@/hooks/useVapi';
 import { MessageList, ChatFooter } from '@/components/chat';
 
-/* ─── Component ───────────────────────────────────────── */
 export default function ChatPage() {
-  /* 🔄 instead of useLoaderData() */
-  const { personaId } = useParams<{ personaId: string }>();
-  const persona: Persona | undefined = personaId
-    ? PERSONAS[personaId as keyof typeof PERSONAS]
-    : undefined;
-
   const navigate = useNavigate();
+  const { personaId } = useParams<{ personaId: string }>();
 
-  /* 👉 handle unknown ID gracefully */
+  const [persona, setPersona] = useState<Persona | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!personaId) return;
+
+    const fetchPersona = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('personas')
+        .select(
+          'id, name, age, bio, assistantId:vapi_assistant_id, imageUrl:image_url, bgUrl:bg_url'
+        )
+        .eq('id', personaId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching persona:', error);
+        setPersona(null);
+      } else {
+        setPersona(data);
+      }
+      setLoading(false);
+    };
+
+    fetchPersona();
+  }, [personaId]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          bgcolor: 'black',
+        }}
+      >
+        <CircularProgress color="inherit" />
+      </Box>
+    );
+  }
+
   if (!persona) {
     return (
-      <Box sx={{ p: 4, textAlign: 'center' }}>
+      <Box
+        sx={{
+          p: 4,
+          textAlign: 'center',
+          height: '100vh',
+          bgcolor: 'black',
+          color: 'white',
+        }}
+      >
         <Typography variant="h6">Persona not found</Typography>
-        <IconButton onClick={() => navigate('/')}>
+        <IconButton sx={{ color: 'white' }} onClick={() => navigate('/')}>
           <ArrowBackIcon />
         </IconButton>
       </Box>
     );
   }
 
-  /* ─── Original logic unchanged ─── */
+  return <ChatComponent persona={persona} />;
+}
+
+// Extracted the original component logic for clarity
+function ChatComponent({ persona }: { persona: Persona }) {
+  const navigate = useNavigate();
   const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
   const { start, stop, transcripts, status } = useVapi(
     apiKey,
@@ -68,8 +119,6 @@ export default function ChatPage() {
         flexDirection: 'column',
         overflow: 'hidden',
         color: 'common.white',
-
-        // inline background image
         backgroundImage: `url(${persona.bgUrl})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
