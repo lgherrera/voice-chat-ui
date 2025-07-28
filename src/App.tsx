@@ -54,7 +54,7 @@ const AppRoutes = () => {
       {/* ----- PRIVATE (requires session) ----- */}
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/chat/:personaId" element={<ChatPage />} />
+        <Route path="/chat/:personaName" element={<ChatPage />} />
         <Route path="/text/:personaName" element={<ChatOnlyPage />} /> {/* 👈 Add the new route */}
       </Route>
 

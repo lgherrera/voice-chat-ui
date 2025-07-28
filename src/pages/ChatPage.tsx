@@ -11,13 +11,16 @@ import { MessageList, ChatFooter } from '@/components/chat';
 
 export default function ChatPage() {
   const navigate = useNavigate();
-  const { personaId } = useParams<{ personaId: string }>();
+  const { personaName } = useParams<{ personaName: string }>();
 
-  const [persona, setPersona] = useState<Persona | null>(null);
+  const persona: Persona | undefined = personaName
+    ? PERSONAS[personaName as keyof typeof PERSONAS]
+    : undefined;
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!personaId) return;
+    if (!persona) return;
 
     const fetchPersona = async () => {
       setLoading(true);
@@ -26,20 +29,20 @@ export default function ChatPage() {
         .select(
           'id, name, age, bio, assistantId:vapi_assistant_id, imageUrl:image_url, bgUrl:bg_url'
         )
-        .eq('id', personaId)
+        .eq('id', persona.id)
         .single();
 
       if (error) {
         console.error('Error fetching persona:', error);
-        setPersona(null);
+        // setPersona(null); // This line was removed as persona is now directly available
       } else {
-        setPersona(data);
+        // setPersona(data); // This line was removed as persona is now directly available
       }
       setLoading(false);
     };
 
     fetchPersona();
-  }, [personaId]);
+  }, [persona]);
 
   if (loading) {
     return (
