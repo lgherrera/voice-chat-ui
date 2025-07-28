@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Box, Typography, Button } from '@mui/material';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName: string }>();
+  const navigate = useNavigate();
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +23,7 @@ export default function ChatOnlyPage() {
         .single();
 
       if (error) {
-        console.error('Error fetching persona:', error);
+        console.error('Error fetching persona in ChatOnlyPage:', error);
         setPersona(null);
       } else {
         setPersona(data);
@@ -47,6 +48,7 @@ export default function ChatOnlyPage() {
   return (
     <Box
       sx={{
+        position: 'relative', // Needed for absolute positioning of the icon
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -56,6 +58,14 @@ export default function ChatOnlyPage() {
         p: 3,
       }}
     >
+      <IconButton
+        aria-label="Back"
+        onClick={() => navigate('/')}
+        sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.700' }}
+      >
+        <ArrowBackIcon />
+      </IconButton>
+
       <Typography variant="h4" gutterBottom>
         Ready to chat?
       </Typography>
