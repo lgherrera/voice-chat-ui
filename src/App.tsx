@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 import HomePage from '@/pages/HomePage';
 import ChatPage from '@/pages/ChatPage';
+import ChatOnlyPage from '@/pages/ChatOnlyPage'; // 👈 Import the new page
 import SignIn from '@/pages/SignIn';
 import UpdatePasswordPage from '@/pages/UpdatePasswordPage'; // 👈 1. IMPORT THE NEW PAGE
 import ProtectedRoute from '@/components/ProtectedRoute'; // logged-in required
@@ -54,6 +55,7 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/chat/:personaId" element={<ChatPage />} />
+        <Route path="/text/:personaName" element={<ChatOnlyPage />} /> {/* 👈 Add the new route */}
       </Route>
 
       {/* ----- FALLBACK ----- */}
