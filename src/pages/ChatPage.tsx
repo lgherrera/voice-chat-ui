@@ -19,7 +19,7 @@ export default function ChatPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from('personas')
-        .select('id, name, age, bio, bgUrl:bg_url, imageUrl:image_url, assistantId:vapi_assistant_id, supportsVoice:supports_voice')
+        .select('id, name, age, bio, bgUrl:bg_url, imageUrl:image_url, assistantId:vapi_assistant_id')
         .ilike('name', personaName)
         .single();
 

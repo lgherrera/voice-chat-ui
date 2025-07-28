@@ -8,7 +8,6 @@ export interface Persona {
   bgUrl: string;
   imageUrl: string;         // new property for persona preview image
   assistantId: string;
-  supportsVoice: boolean;
 }
 
 export const PERSONAS: Record<string, Persona> = {
@@ -20,7 +19,6 @@ export const PERSONAS: Record<string, Persona> = {
     bgUrl: '/bg-maya.jpg',
     imageUrl: '/preview-maya.jpg',  // preview image in /public folder
     assistantId: '5f788679-dd94-4cc5-901f-24daf04d1f48',
-    supportsVoice: true,  
   },
   valentina: {
     id: 'valentina',
@@ -30,7 +28,6 @@ export const PERSONAS: Record<string, Persona> = {
     bgUrl: '/bg-valentina.jpg',
     imageUrl: '/preview-valentina.jpg',
     assistantId: '34fb4f48-27ad-4203-8919-218b9d74d992',
-    supportsVoice: true,
   },
   fernanda: {
     id: 'fernanda',
@@ -40,7 +37,6 @@ export const PERSONAS: Record<string, Persona> = {
     bgUrl: '/bg-fernanda.jpg',
     imageUrl: '/preview-fernanda.jpg',
     assistantId: 'c1234567-abcd-8901-2345-abcdef678901',
-    supportsVoice: true,
   },
   // add other personas here...
 };
