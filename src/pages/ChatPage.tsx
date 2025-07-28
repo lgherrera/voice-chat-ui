@@ -5,7 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { supabase } from '@/lib/supabaseClient';
-import { PERSONAS, type Persona } from '@/constants/personas';
+import { type Persona } from '@/constants/personas';
 import { useVapi } from '@/hooks/useVapi';
 import { MessageList, ChatFooter } from '@/components/chat';
 

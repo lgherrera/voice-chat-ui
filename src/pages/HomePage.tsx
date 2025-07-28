@@ -138,7 +138,7 @@ export default function HomePage() {
               imageUrl={p.imageUrl}
               headline={`${p.name}, ${p.age}`}
               bio={p.bio ?? ''}
-              onClick={() => navigate(`/text/${p.id}`)}
+              onClick={() => navigate(`/text/${p.name.toLowerCase()}`)}
             />
           ))
         )}
