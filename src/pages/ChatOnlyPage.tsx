@@ -1,4 +1,4 @@
-import React, 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -9,10 +9,10 @@ import { type Persona } from '@/constants/personas';
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName: string }>();
   const navigate = useNavigate();
-  const [persona, setPersona] = React.useState<Persona | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [persona, setPersona] = useState<Persona | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchPersona = async () => {
       if (!personaName) {
         setLoading(false);
@@ -70,7 +70,7 @@ export default function ChatOnlyPage() {
   return (
     <Box
       sx={{
-        position: 'relative', // Needed for absolute positioning of the icon
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
