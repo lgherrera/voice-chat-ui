@@ -42,9 +42,9 @@ export default function ChatOnlyPage() {
 
   useEffect(() => {
     if (persona?.bgUrl) {
-      // Assumes a bucket named 'persona_assets'. Change if yours is different.
+      // Use the correct bucket name provided by the user
       const { data } = supabase.storage
-        .from('persona_assets')
+        .from('bg-images')
         .getPublicUrl(persona.bgUrl);
       
       if (data?.publicUrl) {

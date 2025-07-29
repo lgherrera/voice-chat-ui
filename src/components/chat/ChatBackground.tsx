@@ -1,3 +1,4 @@
+// src/components/chat/ChatBackground.tsx
 import React from 'react';
 import { Box } from '@mui/material';
 
