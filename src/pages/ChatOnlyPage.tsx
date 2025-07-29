@@ -1,10 +1,11 @@
+// src/pages/ChatOnlyPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { supabase } from '@/lib/supabaseClient';
-import { type Persona } from '@/constants/personas'; // Use the shared, correct type
+import { type Persona } from '@/constants/personas';
 import { ChatBackground } from '@/components/chat';
 
 export default function ChatOnlyPage() {
@@ -17,7 +18,6 @@ export default function ChatOnlyPage() {
     const fetchPersona = async () => {
       if (!personaName) return;
       setLoading(true);
-      // Fetch all required fields to match the Persona type
       const { data, error } = await supabase
         .from('personas')
         .select('id, name, age, bio, bgUrl:bg_url, imageUrl:image_url, assistantId:vapi_assistant_id')
@@ -53,46 +53,66 @@ export default function ChatOnlyPage() {
   }
 
   return (
+    // 👇 STYLING UPDATED TO MATCH ChatPage.tsx 👇
     <Box
       sx={{
-        position: 'relative',
+        position: 'fixed',
+        inset: 0,
+        maxWidth: 430,
+        mx: 'auto',
+        height: '100dvh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '100vh',
-        color: 'white',
+        color: 'common.white',
         textAlign: 'center',
         p: 3,
       }}
     >
+      {/* This part remains the same */}
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
-      <IconButton
-        aria-label="Back"
-        onClick={() => navigate('/')}
-        sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}
-      >
-        <ArrowBackIcon />
-      </IconButton>
+      {/* 👇 ADDED DARK OVERLAY FOR TEXT READABILITY (from ChatPage.tsx) 👇 */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          bgcolor: 'rgba(0, 0, 0, 0.3)',
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
 
-      <Typography variant="h4" gutterBottom sx={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-        Ready to chat?
-      </Typography>
-      <Typography sx={{ mb: 4, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-        Click the button below to start a conversation with {persona.name}.
-      </Typography>
+      {/* All content below is now wrapped in a Box to ensure it's on top of the overlay */}
+      <Box sx={{ position: 'relative', zIndex: 1, width: '100%' }}>
+        <IconButton
+          aria-label="Back"
+          onClick={() => navigate('/')}
+          sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
 
-      <Button
-        variant="contained"
-        size="large"
-        component={Link}
-        to={`/chat/${persona.name.toLowerCase()}`}
-        endIcon={<ArrowForwardIcon />}
-      >
-        Chat with {persona.name}
-      </Button>
+        <Typography variant="h4" gutterBottom sx={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
+          Ready to chat?
+        </Typography>
+        <Typography sx={{ mb: 4, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
+          Click the button below to start a conversation with {persona.name}.
+        </Typography>
+
+        <Button
+          variant="contained"
+          size="large"
+          component={Link}
+          to={`/chat/${persona.name.toLowerCase()}`}
+          endIcon={<ArrowForwardIcon />}
+        >
+          Chat with {persona.name}
+        </Button>
+      </Box>
     </Box>
   );
 }
+
 
