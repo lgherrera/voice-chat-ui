@@ -71,7 +71,8 @@ export default function ChatOnlyPage() {
         p: 3,
       }}
     >
-      {persona.bgUrl && <ChatBackground image={persona.bgUrl} />}
+      {/* This is the fix: using persona?.bgUrl ensures it won't crash */}
+      {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
       <IconButton
         aria-label="Back"
