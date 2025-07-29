@@ -17,15 +17,10 @@ export default function ChatOnlyPage() {
   const navigate = useNavigate();
   const [persona, setPersona] = useState<ChatOnlyPersona | null>(null);
   const [loading, setLoading] = useState(true);
-  const [backgroundUrl, setBackgroundUrl] = useState('');
 
   useEffect(() => {
     const fetchPersona = async () => {
-      console.log('DEBUG: Starting to fetch persona data...');
-      if (!personaName) {
-        console.error('DEBUG: No personaName in URL. Stopping.');
-        return;
-      }
+      if (!personaName) return;
       setLoading(true);
       const { data, error } = await supabase
         .from('personas')
@@ -34,12 +29,9 @@ export default function ChatOnlyPage() {
         .single();
 
       if (error) {
-        console.error('DEBUG: Error fetching from "personas" table:', error);
-      } else if (data) {
-        console.log('DEBUG: Successfully fetched persona data:', data);
-        setPersona(data);
+        console.error('Error fetching persona:', error);
       } else {
-        console.error('DEBUG: No data or error returned from persona fetch.');
+        setPersona(data);
       }
       setLoading(false);
     };
@@ -47,25 +39,6 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
 
-  useEffect(() => {
-    console.log('DEBUG: Checking if we should fetch storage URL. Persona object:', persona);
-    if (persona?.bgUrl) {
-      console.log(`DEBUG: Persona has bgUrl: "${persona.bgUrl}". Attempting to get public URL from bucket "bg-images".`);
-      const { data } = supabase.storage
-        .from('bg-images')
-        .getPublicUrl(persona.bgUrl);
-      
-      console.log('DEBUG: Supabase storage response:', data);
-      if (data?.publicUrl) {
-        console.log('DEBUG: Successfully got public URL:', data.publicUrl);
-        setBackgroundUrl(data.publicUrl);
-      } else {
-        console.error('DEBUG: Failed to get public URL from storage response.');
-      }
-    }
-  }, [persona]);
-
-  console.log(`DEBUG: Rendering component. Current backgroundUrl state: "${backgroundUrl}"`);
 
   if (loading) {
     return (
@@ -98,7 +71,7 @@ export default function ChatOnlyPage() {
         p: 3,
       }}
     >
-      {backgroundUrl ? <ChatBackground image={backgroundUrl} /> : <p>DEBUG: No backgroundUrl, not rendering ChatBackground.</p>}
+      {persona.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
       <IconButton
         aria-label="Back"

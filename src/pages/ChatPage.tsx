@@ -12,7 +12,6 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
-  const [backgroundUrl, setBackgroundUrl] = useState('');
 
   useEffect(() => {
     const fetchPersona = async () => {
@@ -34,19 +33,6 @@ export default function ChatPage() {
 
     fetchPersona();
   }, [personaName]);
-
-  useEffect(() => {
-    if (persona?.bgUrl) {
-      // Use the correct bucket name provided by the user
-      const { data } = supabase.storage
-        .from('bg-images')
-        .getPublicUrl(persona.bgUrl);
-      
-      if (data?.publicUrl) {
-        setBackgroundUrl(data.publicUrl);
-      }
-    }
-  }, [persona]);
 
   const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
   const { start, stop, transcripts, status } = useVapi(
@@ -104,11 +90,10 @@ export default function ChatPage() {
         flexDirection: 'column',
         overflow: 'hidden',
         color: 'common.white',
-        backgroundImage: `url(${persona.bgUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
       }}
     >
+      {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
+
       <Box
         sx={{
           position: 'absolute',
