@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -9,12 +9,16 @@ import { type Persona } from '@/constants/personas';
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName: string }>();
   const navigate = useNavigate();
-  const [persona, setPersona] = useState<Persona | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [persona, setPersona] = React.useState<Persona | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchPersona = async () => {
-      if (!personaName) return;
+      if (!personaName) {
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       const { data, error } = await supabase
         .from('personas')
@@ -36,6 +40,23 @@ export default function ChatOnlyPage() {
 
   const displayName = persona ? persona.name : 'this person';
 
+  // 1. Handle the loading state first
+  if (loading) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '100vh' 
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // 2. Handle the "not found" state after loading is complete
   if (!persona) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
@@ -45,6 +66,7 @@ export default function ChatOnlyPage() {
     );
   }
 
+  // 3. Render the main content if loading is done and persona exists
   return (
     <Box
       sx={{
