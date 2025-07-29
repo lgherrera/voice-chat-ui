@@ -4,31 +4,33 @@ import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/mate
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { supabase } from '@/lib/supabaseClient';
-import { type Persona } from '@/constants/personas';
+import { ChatBackground } from '@/components/chat';
+
+// A minimal type for just the data this page needs
+interface ChatOnlyPersona {
+  name: string;
+  bgUrl: string;
+}
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName: string }>();
   const navigate = useNavigate();
-  const [persona, setPersona] = useState<Persona | null>(null);
+  const [persona, setPersona] = useState<ChatOnlyPersona | null>(null);
   const [loading, setLoading] = useState(true);
+  const [backgroundUrl, setBackgroundUrl] = useState('');
 
   useEffect(() => {
     const fetchPersona = async () => {
-      if (!personaName) {
-        setLoading(false);
-        return;
-      }
-      
+      if (!personaName) return;
       setLoading(true);
       const { data, error } = await supabase
         .from('personas')
-        .select('id, name, age, bio, bgUrl:bg_url, imageUrl:image_url, assistantId:vapi_assistant_id')
-        .ilike('name', personaName) // Use case-insensitive search on the name
+        .select('name, bgUrl:bg_url')
+        .ilike('name', personaName)
         .single();
 
       if (error) {
-        console.error('Error fetching persona in ChatOnlyPage:', error);
-        setPersona(null);
+        console.error('Error fetching persona:', error);
       } else {
         setPersona(data);
       }
@@ -38,25 +40,27 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
 
-  const displayName = persona ? persona.name : 'this person';
+  useEffect(() => {
+    if (persona?.bgUrl) {
+      // Assumes a bucket named 'persona_assets'. Change if yours is different.
+      const { data } = supabase.storage
+        .from('persona_assets')
+        .getPublicUrl(persona.bgUrl);
+      
+      if (data?.publicUrl) {
+        setBackgroundUrl(data.publicUrl);
+      }
+    }
+  }, [persona]);
 
-  // 1. Handle the loading state first
   if (loading) {
     return (
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          minHeight: '100vh' 
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     );
   }
 
-  // 2. Handle the "not found" state after loading is complete
   if (!persona) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
@@ -66,7 +70,6 @@ export default function ChatOnlyPage() {
     );
   }
 
-  // 3. Render the main content if loading is done and persona exists
   return (
     <Box
       sx={{
@@ -76,23 +79,26 @@ export default function ChatOnlyPage() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        bgcolor: '#f0f2f5',
+        color: 'white',
+        textAlign: 'center',
         p: 3,
       }}
     >
+      {backgroundUrl && <ChatBackground image={backgroundUrl} />}
+
       <IconButton
         aria-label="Back"
         onClick={() => navigate('/')}
-        sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.700' }}
+        sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}
       >
         <ArrowBackIcon />
       </IconButton>
 
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
         Ready to chat?
       </Typography>
-      <Typography sx={{ mb: 4 }}>
-        Click the button below to start a conversation with {displayName}.
+      <Typography sx={{ mb: 4, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
+        Click the button below to start a conversation with {persona.name}.
       </Typography>
 
       <Button
