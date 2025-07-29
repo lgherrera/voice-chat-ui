@@ -4,27 +4,23 @@ import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/mate
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { supabase } from '@/lib/supabaseClient';
+import { type Persona } from '@/constants/personas'; // Use the shared, correct type
 import { ChatBackground } from '@/components/chat';
-
-// A minimal type for just the data this page needs
-interface ChatOnlyPersona {
-  name: string;
-  bgUrl: string;
-}
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName: string }>();
   const navigate = useNavigate();
-  const [persona, setPersona] = useState<ChatOnlyPersona | null>(null);
+  const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPersona = async () => {
       if (!personaName) return;
       setLoading(true);
+      // Fetch all required fields to match the Persona type
       const { data, error } = await supabase
         .from('personas')
-        .select('name, bgUrl:bg_url')
+        .select('id, name, age, bio, bgUrl:bg_url, imageUrl:image_url, assistantId:vapi_assistant_id')
         .ilike('name', personaName)
         .single();
 
@@ -38,7 +34,6 @@ export default function ChatOnlyPage() {
 
     fetchPersona();
   }, [personaName]);
-
 
   if (loading) {
     return (
@@ -71,7 +66,6 @@ export default function ChatOnlyPage() {
         p: 3,
       }}
     >
-      {/* This is the fix: using persona?.bgUrl ensures it won't crash */}
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
       <IconButton
