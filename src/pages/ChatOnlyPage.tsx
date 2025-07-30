@@ -95,7 +95,6 @@ export default function ChatOnlyPage() {
           sx={{
             position: 'absolute',
             left: 20,
-            // 👇 Changed top from 16 to 20
             top: 20,
             color: 'grey.300'
           }}
@@ -110,13 +109,9 @@ export default function ChatOnlyPage() {
           sx={{
             position: 'absolute',
             right: 20,
-            // 👇 Changed top from 16 to 20
             top: 20,
-            color: 'white',
-            bgcolor: 'success.main',
-            '&:hover': {
-              bgcolor: 'success.dark',
-            },
+            // 👇 Background color is removed and icon color is set to green
+            color: 'success.main',
           }}
         >
           <PhoneIcon sx={{ fontSize: 30 }} />
