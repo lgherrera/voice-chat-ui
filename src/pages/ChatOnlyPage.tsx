@@ -4,7 +4,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-// 👇 1. Import the PhoneIcon
 import PhoneIcon from '@mui/icons-material/Phone';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
@@ -40,7 +39,6 @@ export default function ChatOnlyPage() {
   
   const handleSend = (text: string) => {
     console.log('Message sent:', text);
-    // In a real app, you might handle this text differently
   };
 
   if (loading) {
@@ -98,7 +96,6 @@ export default function ChatOnlyPage() {
           <ArrowBackIcon />
         </IconButton>
 
-        {/* 👇 2. Add the green phone icon button here */}
         <IconButton
           aria-label="Start Call"
           component={Link}
@@ -108,7 +105,7 @@ export default function ChatOnlyPage() {
             right: 8,
             top: 8,
             color: 'white',
-            bgcolor: 'success.main', // A semantic green color
+            bgcolor: 'success.main',
             '&:hover': {
               bgcolor: 'success.dark',
             },
@@ -117,12 +114,7 @@ export default function ChatOnlyPage() {
           <PhoneIcon />
         </IconButton>
 
-        <Typography variant="h4" gutterBottom sx={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-          Ready to chat?
-        </Typography>
-        <Typography sx={{ mb: 4, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-          Click the button below to start a conversation with {persona.name}.
-        </Typography>
+        {/* The "Ready to chat?" and instructional text have been removed from here. */}
 
         <Button
           variant="contained"
