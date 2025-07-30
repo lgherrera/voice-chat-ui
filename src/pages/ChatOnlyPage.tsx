@@ -35,7 +35,7 @@ export default function ChatOnlyPage() {
 
     fetchPersona();
   }, [personaName]);
-  
+
   const handleSend = (text: string) => {
     console.log('Message sent:', text);
   };
@@ -110,10 +110,10 @@ export default function ChatOnlyPage() {
             },
           }}
         >
-          <PhoneIcon />
+          {/* 👇 Icon size updated to 30px */}
+          <PhoneIcon sx={{ fontSize: 30 }} />
         </IconButton>
 
-        {/* The main "Chat with..." button has been removed from here. */}
       </Box>
 
       <MessageComposer onSend={handleSend} />
