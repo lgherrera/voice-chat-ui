@@ -11,7 +11,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
   const [draft, setDraft] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevents the browser from reloading the page
+    e.preventDefault();
     if (!draft.trim()) return;
     onSend(draft);
     setDraft('');
@@ -38,6 +38,8 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
       <TextField
         fullWidth
         variant="filled"
+        // 👇 Add this prop to remove the underline
+        InputProps={{ disableUnderline: true }}
         size="small"
         placeholder="Message"
         value={draft}
