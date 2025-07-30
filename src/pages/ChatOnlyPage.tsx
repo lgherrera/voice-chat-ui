@@ -11,7 +11,6 @@ import { MessageComposer } from '@/components/chat/MessageComposer';
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName:string }>();
-  // The navigate const is no longer needed for the back button, but we'll keep it for now.
   const navigate = useNavigate();
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +89,6 @@ export default function ChatOnlyPage() {
           p: 1,
         }}
       >
-        {/* 👇 Back arrow is now a Link component to the homepage */}
         <IconButton
           aria-label="Back"
           component={Link}
@@ -99,13 +97,14 @@ export default function ChatOnlyPage() {
             position: 'absolute',
             left: 20,
             top: 20,
-            color: 'grey.300'
+            color: 'grey.300',
+            // 👇 zIndex added
+            zIndex: 10,
           }}
         >
           <ArrowBackIcon />
         </IconButton>
 
-        {/* 👇 Phone icon link to the chat page is restored */}
         <IconButton
           aria-label="Start Call"
           component={Link}
@@ -115,6 +114,8 @@ export default function ChatOnlyPage() {
             right: 20,
             top: 20,
             color: 'success.main',
+            // 👇 zIndex added
+            zIndex: 10,
           }}
         >
           <PhoneIcon sx={{ fontSize: 30 }} />
