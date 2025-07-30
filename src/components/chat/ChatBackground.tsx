@@ -2,12 +2,10 @@
 import React from 'react';
 import { Box } from '@mui/material';
 
-// 👇 1. Define an interface for the component's props
 interface ChatBackgroundProps {
   image: string;
 }
 
-// 👇 2. Use the interface and destructure the 'image' prop
 export default function ChatBackground({ image }: ChatBackgroundProps) {
   return (
     <Box
@@ -18,6 +16,8 @@ export default function ChatBackground({ image }: ChatBackgroundProps) {
         backgroundImage: `url(${image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        // 👇 Add the opacity property here. Adjust the value as needed.
+        opacity: 0.9,
       }}
     />
   );
