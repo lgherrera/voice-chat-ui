@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, IconButton } from '@mui/material';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+// 👇 1. Import VideocamIcon and remove the old icon
+import VideocamIcon from '@mui/icons-material/Videocam';
 import PhoneIcon from '@mui/icons-material/Phone';
 
 interface ChatFooterProps {
@@ -22,13 +23,13 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
         alignItems: 'center',
       }}
     >
-      {/* history icon */}
+      {/* 👇 2. Replaced the history icon with the video icon */}
       <IconButton
-        aria-label="Chat history"
+        aria-label="Video call"
         onClick={onHistory}
-        sx={{ color: 'grey.500', '&:hover': { color: 'common.white' } }}
+        sx={{ color: 'primary.main', '&:hover': { color: 'primary.dark' } }}
       >
-        <ChatBubbleOutlineIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
+        <VideocamIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
       </IconButton>
 
       {/* start call – white icon on green circle */}
