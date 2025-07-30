@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { supabase } from '@/lib/supabaseClient';
@@ -114,17 +113,7 @@ export default function ChatOnlyPage() {
           <PhoneIcon />
         </IconButton>
 
-        {/* The "Ready to chat?" and instructional text have been removed from here. */}
-
-        <Button
-          variant="contained"
-          size="large"
-          component={Link}
-          to={`/chat/${persona.name.toLowerCase()}`}
-          endIcon={<ArrowForwardIcon />}
-        >
-          Chat with {persona.name}
-        </Button>
+        {/* The main "Chat with..." button has been removed from here. */}
       </Box>
 
       <MessageComposer onSend={handleSend} />
