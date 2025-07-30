@@ -84,10 +84,12 @@ export default function ChatOnlyPage() {
       <Box
         sx={{
           position: 'relative',
-          // 👇 Changed zIndex from 1 to 2 to place header above the content area
           zIndex: 2,
           width: '100%',
           p: 1,
+          // 👇 Added styles to center text and set color
+          textAlign: 'center',
+          color: 'common.white',
         }}
       >
         <IconButton
@@ -119,6 +121,15 @@ export default function ChatOnlyPage() {
         >
           <PhoneIcon sx={{ fontSize: 30 }} />
         </IconButton>
+        
+        {/* 👇 Added Name and Age Typography */}
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 300, mt: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}
+        >
+          {persona.name}, {persona.age}
+        </Typography>
+
       </Box>
 
       <Box
