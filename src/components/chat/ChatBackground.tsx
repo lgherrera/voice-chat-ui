@@ -17,7 +17,7 @@ export default function ChatBackground({ image }: ChatBackgroundProps) {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         // 👇 Add the opacity property here. Adjust the value as needed.
-        opacity: 0.9,
+        opacity: 1,
       }}
     />
   );
