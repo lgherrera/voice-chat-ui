@@ -67,7 +67,6 @@ export default function ChatOnlyPage() {
         height: '100dvh',
         display: 'flex',
         flexDirection: 'column',
-        // 👇 Centering properties are removed from the main container
       }}
     >
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
@@ -82,19 +81,24 @@ export default function ChatOnlyPage() {
         }}
       />
 
-      {/* 👇 1. HEADER AREA: A dedicated container for the icons at the top */}
       <Box
         sx={{
           position: 'relative',
           zIndex: 1,
           width: '100%',
-          p: 1, // Adds some space around the icons
+          p: 1,
         }}
       >
         <IconButton
           aria-label="Back"
           onClick={() => navigate('/')}
-          sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}
+          sx={{
+            position: 'absolute',
+            // 👇 Changed left from 8 to 14
+            left: 14,
+            top: 16,
+            color: 'grey.300'
+          }}
         >
           <ArrowBackIcon />
         </IconButton>
@@ -105,8 +109,9 @@ export default function ChatOnlyPage() {
           to={`/chat/${persona.name.toLowerCase()}`}
           sx={{
             position: 'absolute',
-            right: 8,
-            top: 8,
+            // 👇 Changed right from 8 to 14
+            right: 14,
+            top: 16,
             color: 'white',
             bgcolor: 'success.main',
             '&:hover': {
@@ -118,17 +123,14 @@ export default function ChatOnlyPage() {
         </IconButton>
       </Box>
 
-      {/* 👇 2. MAIN CONTENT AREA: This section takes up the remaining space */}
       <Box
         sx={{
-          flexGrow: 1, // Ensures this area expands
+          flexGrow: 1,
           width: '100%',
           zIndex: 1,
-          // You can add content here later if needed
         }}
       />
       
-      {/* 👇 3. MESSAGE COMPOSER: Stays pinned to the bottom */}
       <MessageComposer onSend={handleSend} />
     </Box>
   );
