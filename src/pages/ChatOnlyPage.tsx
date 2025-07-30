@@ -94,9 +94,9 @@ export default function ChatOnlyPage() {
           onClick={() => navigate('/')}
           sx={{
             position: 'absolute',
-            // 👇 Changed left from 8 to 14
-            left: 14,
-            top: 16,
+            left: 20,
+            // 👇 Changed top from 16 to 20
+            top: 20,
             color: 'grey.300'
           }}
         >
@@ -109,9 +109,9 @@ export default function ChatOnlyPage() {
           to={`/chat/${persona.name.toLowerCase()}`}
           sx={{
             position: 'absolute',
-            // 👇 Changed right from 8 to 14
-            right: 14,
-            top: 16,
+            right: 20,
+            // 👇 Changed top from 16 to 20
+            top: 20,
             color: 'white',
             bgcolor: 'success.main',
             '&:hover': {
