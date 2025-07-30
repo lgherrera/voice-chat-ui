@@ -84,7 +84,8 @@ export default function ChatOnlyPage() {
       <Box
         sx={{
           position: 'relative',
-          zIndex: 1,
+          // 👇 Changed zIndex from 1 to 2 to place header above the content area
+          zIndex: 2,
           width: '100%',
           p: 1,
         }}
@@ -98,7 +99,6 @@ export default function ChatOnlyPage() {
             left: 20,
             top: 20,
             color: 'grey.300',
-            // 👇 zIndex added
             zIndex: 10,
           }}
         >
@@ -114,7 +114,6 @@ export default function ChatOnlyPage() {
             right: 20,
             top: 20,
             color: 'success.main',
-            // 👇 zIndex added
             zIndex: 10,
           }}
         >
