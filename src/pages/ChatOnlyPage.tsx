@@ -4,10 +4,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+// 👇 1. Import the PhoneIcon
+import PhoneIcon from '@mui/icons-material/Phone';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 import { ChatBackground } from '@/components/chat';
-// 👇 1. Import the MessageComposer component
 import { MessageComposer } from '@/components/chat/MessageComposer';
 
 export default function ChatOnlyPage() {
@@ -37,7 +38,6 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
   
-  // 👇 2. Create a handler function for the onSend prop
   const handleSend = (text: string) => {
     console.log('Message sent:', text);
     // In a real app, you might handle this text differently
@@ -98,6 +98,25 @@ export default function ChatOnlyPage() {
           <ArrowBackIcon />
         </IconButton>
 
+        {/* 👇 2. Add the green phone icon button here */}
+        <IconButton
+          aria-label="Start Call"
+          component={Link}
+          to={`/chat/${persona.name.toLowerCase()}`}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: 'white',
+            bgcolor: 'success.main', // A semantic green color
+            '&:hover': {
+              bgcolor: 'success.dark',
+            },
+          }}
+        >
+          <PhoneIcon />
+        </IconButton>
+
         <Typography variant="h4" gutterBottom sx={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
           Ready to chat?
         </Typography>
@@ -116,10 +135,7 @@ export default function ChatOnlyPage() {
         </Button>
       </Box>
 
-      {/* 👇 3. Place the MessageComposer component at the end */}
       <MessageComposer onSend={handleSend} />
     </Box>
   );
 }
-
-
