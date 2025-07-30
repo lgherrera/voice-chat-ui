@@ -38,7 +38,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
       <TextField
         fullWidth
         variant="filled"
-        // 👇 Add this prop to remove the underline
+        // THE FIX IS HERE 👇
         InputProps={{ disableUnderline: true }}
         size="small"
         placeholder="Message"
