@@ -1,3 +1,4 @@
+// src/pages/ChatPage.tsx
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

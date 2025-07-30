@@ -7,9 +7,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 import { ChatBackground } from '@/components/chat';
+// 👇 1. Import the MessageComposer component
+import { MessageComposer } from '@/components/chat/MessageComposer';
 
 export default function ChatOnlyPage() {
-  const { personaName } = useParams<{ personaName: string }>();
+  const { personaName } = useParams<{ personaName:string }>();
   const navigate = useNavigate();
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,12 @@ export default function ChatOnlyPage() {
 
     fetchPersona();
   }, [personaName]);
+  
+  // 👇 2. Create a handler function for the onSend prop
+  const handleSend = (text: string) => {
+    console.log('Message sent:', text);
+    // In a real app, you might handle this text differently
+  };
 
   if (loading) {
     return (
@@ -53,7 +61,6 @@ export default function ChatOnlyPage() {
   }
 
   return (
-    // 👇 STYLING UPDATED TO MATCH ChatPage.tsx 👇
     <Box
       sx={{
         position: 'fixed',
@@ -70,10 +77,8 @@ export default function ChatOnlyPage() {
         p: 3,
       }}
     >
-      {/* This part remains the same */}
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
-      {/* 👇 ADDED DARK OVERLAY FOR TEXT READABILITY (from ChatPage.tsx) 👇 */}
       <Box
         sx={{
           position: 'absolute',
@@ -84,7 +89,6 @@ export default function ChatOnlyPage() {
         }}
       />
 
-      {/* All content below is now wrapped in a Box to ensure it's on top of the overlay */}
       <Box sx={{ position: 'relative', zIndex: 1, width: '100%' }}>
         <IconButton
           aria-label="Back"
@@ -111,6 +115,9 @@ export default function ChatOnlyPage() {
           Chat with {persona.name}
         </Button>
       </Box>
+
+      {/* 👇 3. Place the MessageComposer component at the end */}
+      <MessageComposer onSend={handleSend} />
     </Box>
   );
 }

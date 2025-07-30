@@ -1,3 +1,4 @@
+// src/components/chat/MessageComposer.tsx
 import React, { useState } from 'react';
 import { Box, IconButton, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -9,7 +10,8 @@ interface MessageComposerProps {
 export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
   const [draft, setDraft] = useState('');
 
-  const send = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevents the browser from reloading the page
     if (!draft.trim()) return;
     onSend(draft);
     setDraft('');
@@ -17,6 +19,8 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
 
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         position: 'absolute',
         left: 0,
@@ -38,7 +42,6 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
         placeholder="Message"
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && send()}
         sx={{
           input: { color: 'white' },
           bgcolor: 'rgba(255,255,255,0.15)',
@@ -46,12 +49,17 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({ onSend }) => {
         }}
       />
       <IconButton
+        type="submit"
         aria-label="Send"
-        onClick={send}
+        disabled={!draft.trim()}
         sx={{
           bgcolor: 'black',
           color: 'white',
           '&:hover': { bgcolor: '#333' },
+          '&.Mui-disabled': {
+            bgcolor: 'rgba(0,0,0,0.3)',
+            color: 'rgba(255,255,255,0.3)',
+          },
           width: 48,
           height: 48,
         }}
