@@ -6,14 +6,29 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
-import { ChatBackground } from '@/components/chat';
-import { MessageComposer } from '@/components/chat/MessageComposer';
+// 👇 1. Import your MessageList component and Message type
+import { ChatBackground, MessageComposer, MessageList, type Message } from '@/components/chat';
+
+// 👇 2. Placeholder for your actual Vapi API call
+// You will replace this with your real implementation later.
+const callVapiChatApi = async (message: string, persona: Persona | null): Promise<string> => {
+  console.log(`Sending to Vapi: "${message}" for assistant ${persona?.assistantId}`);
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  // Simulate a response from the assistant
+  return `This is a simulated response to your message: "${message}"`;
+};
+
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName:string }>();
   const navigate = useNavigate();
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // 👇 3. Add state for messages and assistant thinking status
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isAssistantTyping, setIsAssistantTyping] = useState(false);
 
   useEffect(() => {
     const fetchPersona = async () => {
@@ -29,6 +44,8 @@ export default function ChatOnlyPage() {
         console.error('Error fetching persona:', error);
       } else {
         setPersona(data);
+        // Add an initial greeting from the assistant
+        setMessages([{ role: 'assistant', content: `Hi! I'm ${data.name}. What's on your mind?` }]);
       }
       setLoading(false);
     };
@@ -36,8 +53,20 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
 
-  const handleSend = (text: string) => {
-    console.log('Message sent:', text);
+  // 👇 4. Implement the handleSend function to call the API
+  const handleSend = async (text: string) => {
+    // Add the user's message to the list immediately
+    const userMessage: Message = { role: 'user', content: text };
+    setMessages(prev => [...prev, userMessage]);
+    setIsAssistantTyping(true);
+
+    // Call the Vapi API
+    const assistantResponse = await callVapiChatApi(text, persona);
+
+    // Add the assistant's response
+    const assistantMessage: Message = { role: 'assistant', content: assistantResponse };
+    setMessages(prev => [...prev, assistantMessage]);
+    setIsAssistantTyping(false);
   };
 
   if (loading) {
@@ -69,7 +98,7 @@ export default function ChatOnlyPage() {
         flexDirection: 'column',
       }}
     >
-      {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
+      {persona?.bgUrl && <ChatBackground image={persona.bgUrl} opacity={0.5} />}
 
       <Box
         sx={{
@@ -87,7 +116,6 @@ export default function ChatOnlyPage() {
           zIndex: 2,
           width: '100%',
           p: 1,
-          // 👇 Added styles to center text and set color
           textAlign: 'center',
           color: 'common.white',
         }}
@@ -96,13 +124,7 @@ export default function ChatOnlyPage() {
           aria-label="Back"
           component={Link}
           to="/"
-          sx={{
-            position: 'absolute',
-            left: 20,
-            top: 20,
-            color: 'grey.300',
-            zIndex: 10,
-          }}
+          sx={{ position: 'absolute', left: 20, top: 20, color: 'grey.300', zIndex: 10 }}
         >
           <ArrowBackIcon />
         </IconButton>
@@ -111,18 +133,11 @@ export default function ChatOnlyPage() {
           aria-label="Start Call"
           component={Link}
           to={`/chat/${persona.name.toLowerCase()}`}
-          sx={{
-            position: 'absolute',
-            right: 20,
-            top: 20,
-            color: 'success.main',
-            zIndex: 10,
-          }}
+          sx={{ position: 'absolute', right: 20, top: 20, color: 'success.main', zIndex: 10 }}
         >
           <PhoneIcon sx={{ fontSize: 30 }} />
         </IconButton>
         
-        {/* 👇 Added Name and Age Typography */}
         <Typography
           variant="h4"
           sx={{ fontWeight: 300, mt: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}
@@ -132,13 +147,18 @@ export default function ChatOnlyPage() {
 
       </Box>
 
+      {/* 👇 5. Use the MessageList component in the main content area */}
       <Box
         sx={{
           flexGrow: 1,
           width: '100%',
           zIndex: 1,
+          overflowY: 'auto', // Make the message list scrollable
+          px: 2,
         }}
-      />
+      >
+        <MessageList messages={messages} isAssistantTyping={isAssistantTyping} />
+      </Box>
       
       <MessageComposer onSend={handleSend} />
     </Box>

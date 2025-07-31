@@ -6,7 +6,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 import { useVapi } from '@/hooks/useVapi';
-import { MessageList, ChatFooter, ChatBackground } from '@/components/chat';
+// 👇 Assuming 'Message' type is exported from the barrel file
+import { MessageList, ChatFooter, ChatBackground, type Message } from '@/components/chat';
 
 export default function ChatPage() {
   const { personaName } = useParams<{ personaName: string }>();
@@ -16,6 +17,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     const fetchPersona = async () => {
+      // ... (this useEffect remains the same)
       if (!personaName) return;
       setLoading(true);
       const { data, error } = await supabase
@@ -41,6 +43,7 @@ export default function ChatPage() {
     persona?.assistantId ?? ''
   );
 
+  // ... (existing state and useEffect for dialing/connected status remain the same)
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
@@ -55,12 +58,24 @@ export default function ChatPage() {
     return () => clearTimeout(timer);
   }, [status]);
 
+
   const handleStart = () => {
     setDialing(true);
     requestAnimationFrame(() => start());
   };
 
+  // 👇 1. Format the transcripts array before rendering
+  const formattedMessages: Message[] = transcripts.map((line) => {
+    const isUser = line.startsWith('user:');
+    const content = line.replace(/^(user|assistant):\s*/, '');
+    return {
+      role: isUser ? 'user' : 'assistant',
+      content,
+    };
+  });
+
   if (loading) {
+    // ... (loading return remains the same)
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -69,6 +84,7 @@ export default function ChatPage() {
   }
 
   if (!persona) {
+    // ... (persona not found return remains the same)
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography variant="h6">Persona not found</Typography>
@@ -82,6 +98,7 @@ export default function ChatPage() {
   return (
     <Box
       sx={{
+        // ... (main Box sx prop remains the same)
         position: 'fixed',
         inset: 0,
         maxWidth: 430,
@@ -95,52 +112,20 @@ export default function ChatPage() {
     >
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          bgcolor: 'rgba(0, 0, 0, 0.3)',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      />
-      <Box
-        sx={{
-          position: 'relative',
-          zIndex: 1,
-          flexShrink: 0,
-          p: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <IconButton
-          aria-label="Back"
-          onClick={() => navigate(-1)}
-          sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}
-        >
+      {/* ... (overlay and header Box remain the same) */}
+      <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0, 0, 0, 0.3)', zIndex: 0, pointerEvents: 'none' }} />
+      <Box sx={{ position: 'relative', zIndex: 1, flexShrink: 0, p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <IconButton aria-label="Back" onClick={() => navigate(-1)} sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}>
           <ArrowBackIcon />
         </IconButton>
-
-        <Typography variant="h4" sx={{ fontWeight: 300, mt: 1 }}>
-          {persona.name}, {persona.age}
-        </Typography>
-
+        <Typography variant="h4" sx={{ fontWeight: 300, mt: 1 }}>{persona.name}, {persona.age}</Typography>
         {dialing && (
-          <Typography
-            sx={{
-              mt: 1,
-              fontSize: '20px',
-              color: 'grey.300',
-              animation: connected ? 'none' : 'blink 1s step-start infinite',
-              '@keyframes blink': { '50%': { opacity: 0 } },
-            }}
-          >
+          <Typography sx={{ mt: 1, fontSize: '20px', color: 'grey.300', animation: connected ? 'none' : 'blink 1s step-start infinite', '@keyframes blink': { '50%': { opacity: 0 } }}}>
             {connected ? 'Connected' : 'Calling…'}
           </Typography>
         )}
       </Box>
+
       <Box
         sx={{
           position: 'relative',
@@ -150,7 +135,8 @@ export default function ChatPage() {
           px: 2,
         }}
       >
-        <MessageList messages={transcripts} />
+        {/* 👇 2. Pass the newly formatted array to the component */}
+        <MessageList messages={formattedMessages} />
       </Box>
       <Box
         sx={{
@@ -159,7 +145,8 @@ export default function ChatPage() {
           flexShrink: 0,
         }}
       >
-        <ChatFooter onHistory={() => {}} onStart={handleStart} onStop={stop} />
+        {/* 👇 3. Update prop name from onHistory to onVideoCall */}
+        <ChatFooter onVideoCall={() => { console.log('Video call clicked') }} onStart={handleStart} onStop={stop} />
       </Box>
     </Box>
   );
