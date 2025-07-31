@@ -24,7 +24,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
           sx={{
             alignSelf: 'flex-start',
             // 👇 Typing indicator bubble is now also green
-            bgcolor: 'rgba(204, 255, 204, 0.9)',
+            bgcolor: 'rgba(204, 255, 204, 0.6)',
             px: 1.5,
             py: 2,
             borderRadius: 2,
@@ -52,7 +52,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
           // 👇 The background color for the assistant's bubble is now green
           bgcolor: isUser
             ? 'rgba(255,255,255,0.2)'
-            : 'rgba(204, 255, 204, 0.9)',
+            : 'rgba(204, 255, 204, 0.6)',
           color: isUser ? 'white' : 'black',
           px: 1.5,
           py: 1,
