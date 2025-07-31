@@ -53,7 +53,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
           bgcolor: isUser
             ? 'rgba(255,255,255,0.2)'
             : 'rgba(204, 255, 204, 0.4)',
-          color: isUser ? 'white' : 'black',
+          color: isUser ? 'white' : 'white',
           px: 1.5,
           py: 1,
           borderRadius: 2,
