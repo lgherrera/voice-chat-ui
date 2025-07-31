@@ -6,19 +6,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
-// 👇 1. Import your MessageList component and Message type
 import { ChatBackground, MessageComposer, MessageList, type Message } from '@/components/chat';
 
-// 👇 2. Placeholder for your actual Vapi API call
-// You will replace this with your real implementation later.
-const callVapiChatApi = async (message: string, persona: Persona | null): Promise<string> => {
-  console.log(`Sending to Vapi: "${message}" for assistant ${persona?.assistantId}`);
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  // Simulate a response from the assistant
-  return `This is a simulated response to your message: "${message}"`;
-};
-
+// ... (The top part of the component remains the same)
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName:string }>();
@@ -26,10 +16,8 @@ export default function ChatOnlyPage() {
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 👇 3. Add state for messages and assistant thinking status
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isAssistantTyping, setIsAssistantTyping] = useState(false);
-
+  // ... (useEffect, handleSend, loading/error returns remain the same)
+  
   useEffect(() => {
     const fetchPersona = async () => {
       if (!personaName) return;
@@ -44,7 +32,6 @@ export default function ChatOnlyPage() {
         console.error('Error fetching persona:', error);
       } else {
         setPersona(data);
-        // Add an initial greeting from the assistant
         setMessages([{ role: 'assistant', content: `Hi! I'm ${data.name}. What's on your mind?` }]);
       }
       setLoading(false);
@@ -53,20 +40,9 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
 
-  // 👇 4. Implement the handleSend function to call the API
   const handleSend = async (text: string) => {
-    // Add the user's message to the list immediately
     const userMessage: Message = { role: 'user', content: text };
     setMessages(prev => [...prev, userMessage]);
-    setIsAssistantTyping(true);
-
-    // Call the Vapi API
-    const assistantResponse = await callVapiChatApi(text, persona);
-
-    // Add the assistant's response
-    const assistantMessage: Message = { role: 'assistant', content: assistantResponse };
-    setMessages(prev => [...prev, assistantMessage]);
-    setIsAssistantTyping(false);
   };
 
   if (loading) {
@@ -86,6 +62,7 @@ export default function ChatOnlyPage() {
     );
   }
 
+
   return (
     <Box
       sx={{
@@ -98,7 +75,8 @@ export default function ChatOnlyPage() {
         flexDirection: 'column',
       }}
     >
-      {persona?.bgUrl && <ChatBackground image={persona.bgUrl} opacity={0.5} />}
+      {/* 👇 The opacity prop has been removed here */}
+      {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
       <Box
         sx={{
@@ -147,17 +125,16 @@ export default function ChatOnlyPage() {
 
       </Box>
 
-      {/* 👇 5. Use the MessageList component in the main content area */}
       <Box
         sx={{
           flexGrow: 1,
           width: '100%',
           zIndex: 1,
-          overflowY: 'auto', // Make the message list scrollable
+          overflowY: 'auto',
           px: 2,
         }}
       >
-        <MessageList messages={messages} isAssistantTyping={isAssistantTyping} />
+        <MessageList messages={messages} />
       </Box>
       
       <MessageComposer onSend={handleSend} />
