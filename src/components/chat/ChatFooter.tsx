@@ -1,17 +1,19 @@
+// src/components/chat/ChatFooter.tsx
 import React from 'react';
 import { Box, IconButton } from '@mui/material';
-// 👇 1. Import VideocamIcon and remove the old icon
 import VideocamIcon from '@mui/icons-material/Videocam';
 import PhoneIcon from '@mui/icons-material/Phone';
 
 interface ChatFooterProps {
-  onHistory: () => void;
+  // 👇 Renamed from onHistory to onVideoCall
+  onVideoCall: () => void;
   onStart: () => void;
   onStop: () => void;
 }
 
 export const ChatFooter: React.FC<ChatFooterProps> = ({
-  onHistory,
+  // 👇 Update destructured prop name
+  onVideoCall,
   onStart,
   onStop,
 }) => (
@@ -23,16 +25,15 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
         alignItems: 'center',
       }}
     >
-      {/* 👇 2. Replaced the history icon with the video icon */}
       <IconButton
         aria-label="Video call"
-        onClick={onHistory}
+        // 👇 Update onClick handler
+        onClick={onVideoCall}
         sx={{ color: 'primary.main', '&:hover': { color: 'primary.dark' } }}
       >
         <VideocamIcon sx={{ fontSize: { xs: 48, md: 64 } }} />
       </IconButton>
 
-      {/* start call – white icon on green circle */}
       <IconButton aria-label="Start call" onClick={onStart}>
         <Box
           sx={{
@@ -51,7 +52,6 @@ export const ChatFooter: React.FC<ChatFooterProps> = ({
         </Box>
       </IconButton>
 
-      {/* end call – white icon on red circle */}
       <IconButton aria-label="End call" onClick={onStop}>
         <Box
           sx={{

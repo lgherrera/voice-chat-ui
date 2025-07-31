@@ -2,11 +2,13 @@
 import React from 'react';
 import { Box } from '@mui/material';
 
+// 👇 Add the optional 'opacity' prop
 interface ChatBackgroundProps {
   image: string;
+  opacity?: number;
 }
 
-export default function ChatBackground({ image }: ChatBackgroundProps) {
+export default function ChatBackground({ image, opacity = 1 }: ChatBackgroundProps) {
   return (
     <Box
       sx={{
@@ -16,8 +18,8 @@ export default function ChatBackground({ image }: ChatBackgroundProps) {
         backgroundImage: `url(${image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        // 👇 Add the opacity property here. Adjust the value as needed.
-        opacity: 1,
+        // 👇 Use the opacity prop
+        opacity: opacity,
       }}
     />
   );
