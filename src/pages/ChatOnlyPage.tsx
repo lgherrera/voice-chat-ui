@@ -21,7 +21,6 @@ export default function ChatOnlyPage() {
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 👇 1. State for messages and typing status is restored here
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAssistantTyping, setIsAssistantTyping] = useState(false);
 
@@ -39,7 +38,6 @@ export default function ChatOnlyPage() {
         console.error('Error fetching persona:', error);
       } else {
         setPersona(data);
-        // Use setMessages to add the initial greeting
         setMessages([{ role: 'assistant', content: `Hi! I'm ${data.name}. What's on your mind?` }]);
       }
       setLoading(false);
@@ -48,7 +46,6 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
 
-  // 👇 2. The full handleSend logic is restored
   const handleSend = async (text: string) => {
     const userMessage: Message = { role: 'user', content: text };
     setMessages((prev: Message[]) => [...prev, userMessage]);
@@ -61,22 +58,9 @@ export default function ChatOnlyPage() {
     setIsAssistantTyping(false);
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!persona) {
-    return (
-      <Box sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="h6">Persona not found</Typography>
-        <Button component={Link} to="/">Go Home</Button>
-      </Box>
-    );
-  }
+  // ... (loading and error returns remain the same)
+  if (loading) { return ( <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box> );}
+  if (!persona) { return ( <Box sx={{ p: 4, textAlign: 'center' }}><Typography variant="h6">Persona not found</Typography><Button component={Link} to="/">Go Home</Button></Box> );}
 
   return (
     <Box
@@ -91,36 +75,33 @@ export default function ChatOnlyPage() {
       }}
     >
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
-
       <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0, 0, 0, 0.3)', zIndex: 0, pointerEvents: 'none' }} />
 
+      {/* Header Box */}
       <Box sx={{ position: 'relative', zIndex: 2, width: '100%', p: 1, textAlign: 'center', color: 'common.white' }}>
-        <IconButton
-          aria-label="Back"
-          component={Link}
-          to="/"
-          sx={{ position: 'absolute', left: 20, top: 20, color: 'grey.300', zIndex: 10 }}
-        >
+        <IconButton aria-label="Back" component={Link} to="/" sx={{ position: 'absolute', left: 20, top: 20, color: 'grey.300', zIndex: 10 }} >
           <ArrowBackIcon />
         </IconButton>
-
-        <IconButton
-          aria-label="Start Call"
-          component={Link}
-          to={`/chat/${persona.name.toLowerCase()}`}
-          sx={{ position: 'absolute', right: 20, top: 20, color: 'success.main', zIndex: 10 }}
-        >
+        <IconButton aria-label="Start Call" component={Link} to={`/chat/${persona.name.toLowerCase()}`} sx={{ position: 'absolute', right: 20, top: 20, color: 'success.main', zIndex: 10 }} >
           <PhoneIcon sx={{ fontSize: 30 }} />
         </IconButton>
-        
-        <Typography variant="h4" sx={{ fontWeight: 300, mt: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
+        <Typography variant="h4" sx={{ fontWeight: 300, mt: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }} >
           {persona.name}, {persona.age}
         </Typography>
-
       </Box>
 
-      <Box sx={{ flexGrow: 1, width: '100%', zIndex: 1, overflowY: 'auto', px: 2 }}>
-        {/* 👇 3. MessageList now receives the correct props */}
+      {/* Main Content Area */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          width: '100%',
+          zIndex: 1,
+          overflowY: 'auto',
+          px: 2,
+          // 👇 Add padding to the bottom to make space for the composer
+          pb: '88px',
+        }}
+      >
         <MessageList messages={messages} isAssistantTyping={isAssistantTyping} />
       </Box>
       
