@@ -8,7 +8,12 @@ import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 import { ChatBackground, MessageComposer, MessageList, type Message } from '@/components/chat';
 
-// ... (The top part of the component remains the same)
+// Placeholder for your actual Vapi API call
+const callVapiChatApi = async (message: string, persona: Persona | null): Promise<string> => {
+  console.log(`Sending to Vapi: "${message}" for assistant ${persona?.assistantId}`);
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return `This is a simulated response to your message: "${message}"`;
+};
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName:string }>();
@@ -16,8 +21,10 @@ export default function ChatOnlyPage() {
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ... (useEffect, handleSend, loading/error returns remain the same)
-  
+  // 👇 1. State for messages and typing status is restored here
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isAssistantTyping, setIsAssistantTyping] = useState(false);
+
   useEffect(() => {
     const fetchPersona = async () => {
       if (!personaName) return;
@@ -32,6 +39,7 @@ export default function ChatOnlyPage() {
         console.error('Error fetching persona:', error);
       } else {
         setPersona(data);
+        // Use setMessages to add the initial greeting
         setMessages([{ role: 'assistant', content: `Hi! I'm ${data.name}. What's on your mind?` }]);
       }
       setLoading(false);
@@ -40,9 +48,17 @@ export default function ChatOnlyPage() {
     fetchPersona();
   }, [personaName]);
 
+  // 👇 2. The full handleSend logic is restored
   const handleSend = async (text: string) => {
     const userMessage: Message = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev: Message[]) => [...prev, userMessage]);
+    setIsAssistantTyping(true);
+
+    const assistantResponse = await callVapiChatApi(text, persona);
+
+    const assistantMessage: Message = { role: 'assistant', content: assistantResponse };
+    setMessages((prev: Message[]) => [...prev, assistantMessage]);
+    setIsAssistantTyping(false);
   };
 
   if (loading) {
@@ -62,7 +78,6 @@ export default function ChatOnlyPage() {
     );
   }
 
-
   return (
     <Box
       sx={{
@@ -75,29 +90,11 @@ export default function ChatOnlyPage() {
         flexDirection: 'column',
       }}
     >
-      {/* 👇 The opacity prop has been removed here */}
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          bgcolor: 'rgba(0, 0, 0, 0.3)',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0, 0, 0, 0.3)', zIndex: 0, pointerEvents: 'none' }} />
 
-      <Box
-        sx={{
-          position: 'relative',
-          zIndex: 2,
-          width: '100%',
-          p: 1,
-          textAlign: 'center',
-          color: 'common.white',
-        }}
-      >
+      <Box sx={{ position: 'relative', zIndex: 2, width: '100%', p: 1, textAlign: 'center', color: 'common.white' }}>
         <IconButton
           aria-label="Back"
           component={Link}
@@ -116,25 +113,15 @@ export default function ChatOnlyPage() {
           <PhoneIcon sx={{ fontSize: 30 }} />
         </IconButton>
         
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: 300, mt: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}
-        >
+        <Typography variant="h4" sx={{ fontWeight: 300, mt: 1, textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
           {persona.name}, {persona.age}
         </Typography>
 
       </Box>
 
-      <Box
-        sx={{
-          flexGrow: 1,
-          width: '100%',
-          zIndex: 1,
-          overflowY: 'auto',
-          px: 2,
-        }}
-      >
-        <MessageList messages={messages} />
+      <Box sx={{ flexGrow: 1, width: '100%', zIndex: 1, overflowY: 'auto', px: 2 }}>
+        {/* 👇 3. MessageList now receives the correct props */}
+        <MessageList messages={messages} isAssistantTyping={isAssistantTyping} />
       </Box>
       
       <MessageComposer onSend={handleSend} />
