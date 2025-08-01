@@ -8,50 +8,47 @@ import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 import { ChatBackground, MessageComposer, MessageList, type Message } from '@/components/chat';
 
-// 👇 This placeholder function is now replaced with the real API call
-const callVapiChatApi = async (message: string, persona: Persona | null): Promise<string> => {
+// 👇 This function now accepts and returns a chatId
+const callVapiChatApi = async (
+  message: string,
+  persona: Persona | null,
+  chatId: string | null
+): Promise<{ reply: string; chatId: string }> => {
   if (!persona?.assistantId) {
-    return "I'm sorry, my assistant ID is not configured correctly.";
+    throw new Error("Assistant ID not configured.");
   }
 
-  try {
-    // This calls YOUR backend route, not Vapi directly
-    const response = await fetch('/api/vapi-chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: message,
-        assistantId: persona.assistantId,
-      }),
-    });
+  const response = await fetch('/api/vapi-chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: message,
+      assistantId: persona.assistantId,
+      previousChatId: chatId, // Pass the previous chat ID
+    }),
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to get a response from the server.');
-    }
-
-    const data = await response.json();
-    return data.reply; // This is the assistant's message
-
-  } catch (error) {
-    console.error("Error calling chat API:", error);
-    return "I'm having some trouble connecting right now. Please try again later.";
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Server error.');
   }
+
+  return response.json();
 };
 
-
 export default function ChatOnlyPage() {
-  const { personaName } = useParams<{ personaName:string }>();
+  const { personaName } = useParams<{ personaName: string }>();
   const navigate = useNavigate();
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAssistantTyping, setIsAssistantTyping] = useState(false);
+  
+  // 👇 Add state to store the current chat ID
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
 
   useEffect(() => {
+    // ... fetchPersona logic remains the same ...
     const fetchPersona = async () => {
       if (!personaName) return;
       setLoading(true);
@@ -75,16 +72,29 @@ export default function ChatOnlyPage() {
 
   const handleSend = async (text: string) => {
     const userMessage: Message = { role: 'user', content: text };
-    setMessages((prev: Message[]) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsAssistantTyping(true);
 
-    const assistantResponse = await callVapiChatApi(text, persona);
+    try {
+      // 👇 Pass the currentChatId to the API call
+      const { reply, chatId } = await callVapiChatApi(text, persona, currentChatId);
+      
+      const assistantMessage: Message = { role: 'assistant', content: reply };
+      setMessages((prev) => [...prev, assistantMessage]);
+      
+      // 👇 Update the chatId for the next message
+      setCurrentChatId(chatId);
 
-    const assistantMessage: Message = { role: 'assistant', content: assistantResponse };
-    setMessages((prev: Message[]) => [...prev, assistantMessage]);
-    setIsAssistantTyping(false);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      const errorMessage: Message = { role: 'assistant', content: "Sorry, I couldn't connect." };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsAssistantTyping(false);
+    }
   };
 
+  // ... (loading/error returns and the rest of the JSX remain the same)
   if (loading) { return ( <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box> );}
   if (!persona) { return ( <Box sx={{ p: 4, textAlign: 'center' }}><Typography variant="h6">Persona not found</Typography><Button component={Link} to="/">Go Home</Button></Box> );}
 
@@ -102,8 +112,6 @@ export default function ChatOnlyPage() {
     >
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
       <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0, 0, 0, 0.3)', zIndex: 0, pointerEvents: 'none' }} />
-
-      {/* Header Box */}
       <Box sx={{ position: 'relative', zIndex: 2, width: '100%', p: 1, textAlign: 'center', color: 'common.white' }}>
         <IconButton aria-label="Back" component={Link} to="/" sx={{ position: 'absolute', left: 20, top: 20, color: 'grey.300', zIndex: 10 }} >
           <ArrowBackIcon />
@@ -115,21 +123,9 @@ export default function ChatOnlyPage() {
           {persona.name}, {persona.age}
         </Typography>
       </Box>
-
-      {/* Main Content Area */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          width: '100%',
-          zIndex: 1,
-          overflowY: 'auto',
-          px: 2,
-          pb: '88px',
-        }}
-      >
+      <Box sx={{ flexGrow: 1, width: '100%', zIndex: 1, overflowY: 'auto', px: 2, pb: '88px' }}>
         <MessageList messages={messages} isAssistantTyping={isAssistantTyping} />
       </Box>
-      
       <MessageComposer onSend={handleSend} />
     </Box>
   );
