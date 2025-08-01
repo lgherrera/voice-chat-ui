@@ -8,12 +8,39 @@ import { supabase } from '@/lib/supabaseClient';
 import { type Persona } from '@/constants/personas';
 import { ChatBackground, MessageComposer, MessageList, type Message } from '@/components/chat';
 
-// Placeholder for your actual Vapi API call
+// 👇 This placeholder function is now replaced with the real API call
 const callVapiChatApi = async (message: string, persona: Persona | null): Promise<string> => {
-  console.log(`Sending to Vapi: "${message}" for assistant ${persona?.assistantId}`);
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return `This is a simulated response to your message: "${message}"`;
+  if (!persona?.assistantId) {
+    return "I'm sorry, my assistant ID is not configured correctly.";
+  }
+
+  try {
+    // This calls YOUR backend route, not Vapi directly
+    const response = await fetch('/api/vapi-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: message,
+        assistantId: persona.assistantId,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to get a response from the server.');
+    }
+
+    const data = await response.json();
+    return data.reply; // This is the assistant's message
+
+  } catch (error) {
+    console.error("Error calling chat API:", error);
+    return "I'm having some trouble connecting right now. Please try again later.";
+  }
 };
+
 
 export default function ChatOnlyPage() {
   const { personaName } = useParams<{ personaName:string }>();
@@ -58,7 +85,6 @@ export default function ChatOnlyPage() {
     setIsAssistantTyping(false);
   };
 
-  // ... (loading and error returns remain the same)
   if (loading) { return ( <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box> );}
   if (!persona) { return ( <Box sx={{ p: 4, textAlign: 'center' }}><Typography variant="h6">Persona not found</Typography><Button component={Link} to="/">Go Home</Button></Box> );}
 
@@ -98,7 +124,6 @@ export default function ChatOnlyPage() {
           zIndex: 1,
           overflowY: 'auto',
           px: 2,
-          // 👇 Add padding to the bottom to make space for the composer
           pb: '88px',
         }}
       >
