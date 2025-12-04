@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 
 // 1. Initialize Supabase Client
-// Uses your VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from Vercel envs
+// Uses your specific environment variables from keys.png
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.VITE_SUPABASE_ANON_KEY
@@ -17,16 +17,19 @@ const createVapiJWT = (assistantId, userId, chatId) => {
         throw new Error("VAPI_PRIVATE_KEY environment variable is not set.");
     }
 
-    // The payload contains data Vapi uses to manage the session (e.g., routing)
+    // --- CRITICAL CHANGE: Placing chatId inside a 'custom' object ---
     const payload = {
-        // 'sub' (subject) is commonly used for the user ID
+        // Standard Claims
         sub: userId, 
-        // Custom claims to pass useful context to Vapi
-        chatId: chatId, 
-        ast: assistantId // Assistant ID
+        ast: assistantId, 
+        
+        // Vapi passes the 'custom' object to the webhook metadata
+        custom: {
+            chatId: chatId 
+        }
     };
 
-    // Sign the token: use HS256 algorithm and set it to expire relatively soon (e.g., 5 min)
+    // Sign the token: use HS256 algorithm and set it to expire in 5 min
     const token = jwt.sign(payload, vapiSecretKey, { algorithm: 'HS256', expiresIn: '5m' });
     
     return token;
@@ -39,6 +42,8 @@ export default async function handler(req, res) {
   }
 
   // Get required data from the frontend request
+  // Note: We expect 'vapiAssistantId' to be sent from the frontend. 
+  // If you prefer to use the env var as a fallback, you can modify this line.
   const { userId, personaId, vapiAssistantId } = req.body;
 
   if (!userId || !personaId || !vapiAssistantId) {
@@ -50,7 +55,7 @@ export default async function handler(req, res) {
   try {
     // 3. FIND/CREATE CHAT_ID LOGIC
 
-    // A. CHECK: Try to find an existing chat session for this user/persona combination
+    // A. CHECK: Try to find an existing chat session
     const { data: existingChat, error: selectError } = await supabase
       .from('chats')
       .select('id')
@@ -68,17 +73,17 @@ export default async function handler(req, res) {
       const { data: newChat, error: insertError } = await supabase
         .from('chats')
         .insert({ user_id: userId, persona_id: personaId })
-        .select('id'); // Retrieve the newly created ID
+        .select('id');
 
       if (insertError) throw insertError;
 
       chatId = newChat[0].id;
     }
 
-    // 4. Generate the Vapi JWT Token
+    // 4. Generate the Vapi JWT Token with the embedded chatId
     const vapiJWT = createVapiJWT(vapiAssistantId, userId, chatId);
 
-    // 5. SUCCESS: Send the required data back to the frontend for the direct Vapi connection
+    // 5. SUCCESS: Return the chatId (for DB) and JWT (for Vapi)
     res.status(200).json({ 
       chatId: chatId, 
       vapiJWT: vapiJWT 
@@ -86,7 +91,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Session creation failed:', error.message);
-    // Be careful not to expose sensitive error details to the client
     res.status(500).json({ error: 'Internal server error while starting session.' });
   }
 }
