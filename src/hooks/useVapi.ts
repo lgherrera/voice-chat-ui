@@ -49,7 +49,10 @@ export function useVapi(apiKey: string, assistantId: string) {
   }, [apiKey]);
 
   /* ───────── helpers ───────── */
-  const start = () => vapiRef.current?.start(assistantId);
+  
+  // 👇 UPDATED: Accepts an optional 'options' object (for metadata)
+  const start = (options?: any) => vapiRef.current?.start(assistantId, options);
+  
   const stop  = () => vapiRef.current?.stop();
 
   /** Send typed user message; start session if needed, then say() */
@@ -61,7 +64,9 @@ export function useVapi(apiKey: string, assistantId: string) {
 
     // ensure we have a session
     if (status === 'idle') {
-      await vapiRef.current?.start(assistantId);    // plain start
+      // Note: If you want text-started sessions to also have a chatId, 
+      // you would need to fetch it here too. For now, this defaults to basic start.
+      await vapiRef.current?.start(assistantId);    
       setStatus('calling');
     }
 

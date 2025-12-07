@@ -1,4 +1,3 @@
-// src/pages/ChatPage.tsx
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -15,9 +14,9 @@ export default function ChatPage() {
   const [persona, setPersona] = useState<Persona | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 1. Fetch Persona Details
   useEffect(() => {
     const fetchPersona = async () => {
-      // ... (this useEffect remains the same)
       if (!personaName) return;
       setLoading(true);
       const { data, error } = await supabase
@@ -37,16 +36,17 @@ export default function ChatPage() {
     fetchPersona();
   }, [personaName]);
 
+  // 2. Initialize Vapi Hook
   const apiKey = import.meta.env.VITE_VAPI_PUBLIC_KEY as string;
   const { start, stop, transcripts, status } = useVapi(
     apiKey,
     persona?.assistantId ?? ''
   );
 
-  // ... (existing state and useEffect for dialing/connected status remain the same)
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
+  // 3. Handle Status Changes (Dialing vs Connected)
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     if (status === 'calling') {
@@ -58,13 +58,56 @@ export default function ChatPage() {
     return () => clearTimeout(timer);
   }, [status]);
 
-
-  const handleStart = () => {
+  // 4. NEW: Handle Start Call with Session Creation
+  const handleStart = async () => {
     setDialing(true);
-    requestAnimationFrame(() => start());
+
+    try {
+      // A. Get the current logged-in user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user || !persona) {
+        console.error("Missing user or persona info. Cannot start session.");
+        setDialing(false);
+        return;
+      }
+
+      // B. Call your Vercel backend to create the 'chats' row
+      const response = await fetch('/api/start-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          personaId: persona.id,
+          vapiAssistantId: persona.assistantId
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to start session');
+      }
+
+      // C. Retrieve the new Chat ID
+      const { chatId } = await response.json();
+      console.log("✅ Session created with Chat ID:", chatId);
+
+      // D. Start Vapi, passing the chatId in metadata so n8n receives it
+      requestAnimationFrame(() => {
+        start({
+          metadata: {
+            chatId: chatId 
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error("❌ Error starting call:", error);
+      setDialing(false); // Reset UI on failure
+    }
   };
 
-  // 👇 1. Format the transcripts array before rendering
+  // 5. Format transcripts for the UI
   const formattedMessages: Message[] = transcripts.map((line) => {
     const isUser = line.startsWith('user:');
     const content = line.replace(/^(user|assistant):\s*/, '');
@@ -75,7 +118,6 @@ export default function ChatPage() {
   });
 
   if (loading) {
-    // ... (loading return remains the same)
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -84,7 +126,6 @@ export default function ChatPage() {
   }
 
   if (!persona) {
-    // ... (persona not found return remains the same)
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography variant="h6">Persona not found</Typography>
@@ -98,7 +139,6 @@ export default function ChatPage() {
   return (
     <Box
       sx={{
-        // ... (main Box sx prop remains the same)
         position: 'fixed',
         inset: 0,
         maxWidth: 430,
@@ -112,7 +152,7 @@ export default function ChatPage() {
     >
       {persona?.bgUrl && <ChatBackground image={persona.bgUrl} />}
 
-      {/* ... (overlay and header Box remain the same) */}
+      {/* Overlay & Header */}
       <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0, 0, 0, 0.3)', zIndex: 0, pointerEvents: 'none' }} />
       <Box sx={{ position: 'relative', zIndex: 1, flexShrink: 0, p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <IconButton aria-label="Back" onClick={() => navigate(-1)} sx={{ position: 'absolute', left: 8, top: 8, color: 'grey.300' }}>
@@ -126,6 +166,7 @@ export default function ChatPage() {
         )}
       </Box>
 
+      {/* Message List */}
       <Box
         sx={{
           position: 'relative',
@@ -135,9 +176,10 @@ export default function ChatPage() {
           px: 2,
         }}
       >
-        {/* 👇 2. Pass the newly formatted array to the component */}
         <MessageList messages={formattedMessages} />
       </Box>
+      
+      {/* Footer Controls */}
       <Box
         sx={{
           position: 'relative',
@@ -145,8 +187,11 @@ export default function ChatPage() {
           flexShrink: 0,
         }}
       >
-        {/* 👇 3. Update prop name from onHistory to onVideoCall */}
-        <ChatFooter onVideoCall={() => { console.log('Video call clicked') }} onStart={handleStart} onStop={stop} />
+        <ChatFooter 
+          onVideoCall={() => { console.log('Video call clicked') }} 
+          onStart={handleStart} 
+          onStop={stop} 
+        />
       </Box>
     </Box>
   );
