@@ -92,9 +92,14 @@ export default function ChatPage() {
       const { chatId } = await response.json();
       console.log("✅ Session created with Chat ID:", chatId);
 
-      // D. Start Vapi, passing the chatId in metadata so n8n receives it
+      // D. Start Vapi passing chatId in variableValues
+      // We use variableValues because your logs confirmed this object reaches n8n successfully.
       requestAnimationFrame(() => {
         start({
+          variableValues: {
+            chatId: chatId 
+          },
+          // We keep metadata as a backup, but variableValues is our primary target now
           metadata: {
             chatId: chatId 
           }
