@@ -58,21 +58,21 @@ export default function ChatPage() {
     return () => clearTimeout(timer);
   }, [status]);
 
-  // 4. Handle Start Call (Updated with "Spray Method")
+  // 4. Handle Start Call (Clean Version)
   const handleStart = async () => {
     setDialing(true);
 
     try {
-      // A. Get User
+      // A. Get the current logged-in user
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user || !persona) {
-        console.error("❌ Missing user/persona info");
+        console.error("❌ Missing user or persona info. Cannot start session.");
         setDialing(false);
         return;
       }
 
-      // B. Create Session (Backend)
+      // B. Call your Vercel backend to create the 'chats' row
       const response = await fetch('/api/start-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,38 +83,38 @@ export default function ChatPage() {
         }),
       });
 
-      // Handle backend crashes (returns text instead of JSON)
+      // 🔍 Check for backend errors (text vs JSON)
       if (!response.ok) {
         const errorText = await response.text(); 
-        console.error("🚨 Backend Error:", errorText);
-        throw new Error(`Server error: ${errorText}`);
+        console.error("🚨 Backend Error Response:", errorText);
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
       }
 
-      // C. Get Chat ID
+      // C. Retrieve the new Chat ID
       const { chatId } = await response.json();
-      console.log("✅ Session created. Chat ID:", chatId);
+      console.log("✅ Session created with Chat ID:", chatId);
 
-      // D. Start Vapi (sending ChatID in EVERY possible field)
+      // D. Start Vapi (Standard Configuration)
+      // We removed the nested "assistantOverrides" that was causing the crash.
+      // Passing variableValues at the top level is the correct way for the Web SDK.
       requestAnimationFrame(() => {
         start({
-          name: chatId,                   // 1. Appears as Call Name
-          metadata: { chatId: chatId },   // 2. Standard Metadata
-          variableValues: { chatId: chatId }, // 3. Variable Injection
-          assistantOverrides: {           // 4. Explicit Overrides
-            variableValues: {
-              chatId: chatId
-            }
+          variableValues: {
+            chatId: chatId 
+          },
+          metadata: {
+            chatId: chatId 
           }
         });
       });
 
     } catch (error) {
       console.error("❌ Error starting call:", error);
-      setDialing(false);
+      setDialing(false); // Reset UI so user can try again
     }
   };
 
-  // 5. Format messages
+  // 5. Format messages for UI
   const formattedMessages: Message[] = transcripts.map((line) => {
     const isUser = line.startsWith('user:');
     const content = line.replace(/^(user|assistant):\s*/, '');

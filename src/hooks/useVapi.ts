@@ -19,6 +19,11 @@ export function useVapi(apiKey: string, assistantId: string) {
     vapi.on('call-start', () => setStatus('calling'));
     vapi.on('call-end',   () => setStatus('ended'));
 
+    // 👇 NEW: Error Listener to catch SDK errors and prevent crashes
+    vapi.on('error', (e: any) => {
+      console.error("💥 Vapi SDK Error:", e);
+    });
+
     vapi.on('message', (m) => {
       console.log('[Vapi message]', m);
       const o = m as any;
@@ -50,7 +55,7 @@ export function useVapi(apiKey: string, assistantId: string) {
 
   /* ───────── helpers ───────── */
   
-  // 👇 UPDATED: Now accepts 'options' and logs them for debugging
+  // 👇 Ensure 'options' are accepted and logged
   const start = (options?: any) => {
     console.log("🚀 [useVapi] Starting call with options:", options);
     return vapiRef.current?.start(assistantId, options);
