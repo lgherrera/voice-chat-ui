@@ -46,7 +46,7 @@ export default function ChatPage() {
   const [dialing, setDialing] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  // 3. Handle Status Changes (Dialing vs Connected)
+  // 3. Handle Status Changes
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     if (status === 'calling') {
@@ -58,7 +58,7 @@ export default function ChatPage() {
     return () => clearTimeout(timer);
   }, [status]);
 
-  // 4. NEW: Handle Start Call with Session Creation
+  // 4. Handle Start Call (Updated with robust Error Handling)
   const handleStart = async () => {
     setDialing(true);
 
@@ -67,7 +67,7 @@ export default function ChatPage() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user || !persona) {
-        console.error("Missing user or persona info. Cannot start session.");
+        console.error("❌ Missing user or persona info. Cannot start session.");
         setDialing(false);
         return;
       }
@@ -83,23 +83,26 @@ export default function ChatPage() {
         }),
       });
 
+      // 🔍 CRITICAL DEBUGGING STEP:
+      // If the backend fails, it might return text (like "A server error...") instead of JSON.
+      // We explicitly check for this to avoid the "SyntaxError: Unexpected token" crash.
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || 'Failed to start session');
+        const errorText = await response.text(); 
+        console.error("🚨 Backend Error Response:", errorText);
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
       }
 
-      // C. Retrieve the new Chat ID
+      // C. Retrieve the new Chat ID (only if response was OK)
       const { chatId } = await response.json();
       console.log("✅ Session created with Chat ID:", chatId);
 
       // D. Start Vapi passing chatId in variableValues
-      // We use variableValues because your logs confirmed this object reaches n8n successfully.
       requestAnimationFrame(() => {
         start({
           variableValues: {
             chatId: chatId 
           },
-          // We keep metadata as a backup, but variableValues is our primary target now
+          // Keep metadata as backup
           metadata: {
             chatId: chatId 
           }
@@ -108,11 +111,11 @@ export default function ChatPage() {
 
     } catch (error) {
       console.error("❌ Error starting call:", error);
-      setDialing(false); // Reset UI on failure
+      setDialing(false); // Reset UI so user can try again
     }
   };
 
-  // 5. Format transcripts for the UI
+  // 5. Format messages
   const formattedMessages: Message[] = transcripts.map((line) => {
     const isUser = line.startsWith('user:');
     const content = line.replace(/^(user|assistant):\s*/, '');
@@ -201,7 +204,6 @@ export default function ChatPage() {
     </Box>
   );
 }
-
 
 
 
