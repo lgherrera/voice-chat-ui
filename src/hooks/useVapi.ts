@@ -50,9 +50,11 @@ export function useVapi(apiKey: string, assistantId: string) {
 
   /* ───────── helpers ───────── */
   
-  // 👇 THIS IS THE CRITICAL LINE THAT WAS LIKELY MISSING 👇
-  // We must accept 'options' and pass it to the SDK's start method
-  const start = (options?: any) => vapiRef.current?.start(assistantId, options);
+  // 👇 UPDATED: Now accepts 'options' and logs them for debugging
+  const start = (options?: any) => {
+    console.log("🚀 [useVapi] Starting call with options:", options);
+    return vapiRef.current?.start(assistantId, options);
+  };
   
   const stop  = () => vapiRef.current?.stop();
 

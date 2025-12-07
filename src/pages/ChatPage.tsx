@@ -58,21 +58,21 @@ export default function ChatPage() {
     return () => clearTimeout(timer);
   }, [status]);
 
-  // 4. Handle Start Call (Updated with robust Error Handling)
+  // 4. Handle Start Call (Updated with "Spray Method")
   const handleStart = async () => {
     setDialing(true);
 
     try {
-      // A. Get the current logged-in user
+      // A. Get User
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user || !persona) {
-        console.error("❌ Missing user or persona info. Cannot start session.");
+        console.error("❌ Missing user/persona info");
         setDialing(false);
         return;
       }
 
-      // B. Call your Vercel backend to create the 'chats' row
+      // B. Create Session (Backend)
       const response = await fetch('/api/start-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,35 +83,34 @@ export default function ChatPage() {
         }),
       });
 
-      // 🔍 CRITICAL DEBUGGING STEP:
-      // If the backend fails, it might return text (like "A server error...") instead of JSON.
-      // We explicitly check for this to avoid the "SyntaxError: Unexpected token" crash.
+      // Handle backend crashes (returns text instead of JSON)
       if (!response.ok) {
         const errorText = await response.text(); 
-        console.error("🚨 Backend Error Response:", errorText);
-        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+        console.error("🚨 Backend Error:", errorText);
+        throw new Error(`Server error: ${errorText}`);
       }
 
-      // C. Retrieve the new Chat ID (only if response was OK)
+      // C. Get Chat ID
       const { chatId } = await response.json();
-      console.log("✅ Session created with Chat ID:", chatId);
+      console.log("✅ Session created. Chat ID:", chatId);
 
-      // D. Start Vapi passing chatId in variableValues
+      // D. Start Vapi (sending ChatID in EVERY possible field)
       requestAnimationFrame(() => {
         start({
-          variableValues: {
-            chatId: chatId 
-          },
-          // Keep metadata as backup
-          metadata: {
-            chatId: chatId 
+          name: chatId,                   // 1. Appears as Call Name
+          metadata: { chatId: chatId },   // 2. Standard Metadata
+          variableValues: { chatId: chatId }, // 3. Variable Injection
+          assistantOverrides: {           // 4. Explicit Overrides
+            variableValues: {
+              chatId: chatId
+            }
           }
         });
       });
 
     } catch (error) {
       console.error("❌ Error starting call:", error);
-      setDialing(false); // Reset UI so user can try again
+      setDialing(false);
     }
   };
 
